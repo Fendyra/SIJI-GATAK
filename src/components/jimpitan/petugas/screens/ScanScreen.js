@@ -1,5 +1,5 @@
 import React from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+
 import { useEffect } from "react";
 export function ScanScreen({ vm }) {
   return (
