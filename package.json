@@ -1,17 +1,26 @@
 {
   "name": "jimpitan-online",
   "version": "0.1.0",
+  "description": "Sistem informasi jimpitan berbasis web dengan QR Code untuk KKN Siji Gatak",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.7",
+    "html5-qrcode": "^2.3.8",
+    "jszip": "^3.10.1",
+    "lightningcss": "^1.33.0",
+    "lightningcss-darwin-arm64": "^1.33.0",
     "next": "16.2.10",
+    "qrcode": "^1.5.4",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-display: var(--font-sora);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand: #1f7a4d;
+  --color-brand-dark: #186040;
+  --color-brand-deep: #14532d;
+  --color-cream: #f6f4ee;
+  --color-card-border: #e6e1d3;
+  --color-ink: #1c2420;
+  --color-muted: #6f7d74;
+  --color-muted-2: #8a8578;
+  --color-label: #4a544d;
+  --color-warn: #b5691f;
+  --color-warn-bg: #fbeee0;
+  --color-danger: #b3261e;
+  --color-danger-border: #f3c9b4;
+  --color-danger-bg: #fdf4ef;
+  --color-green-bg: #eaf3ec;
+  --color-green-bg-2: #e8f3ec;
+  --color-input-border: #dcd6c5;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+
+a {
+  color: var(--color-brand);
+}
+a:hover {
+  color: var(--color-brand-deep);
+}
+
+input:focus,
+select:focus,
+button:focus-visible {
+  outline: 2px solid #1f7a4d33;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes toastUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes scanPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s ease both;
+}
+.animate-pop-in {
+  animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-toast-up {
+  animation: toastUp 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-scan-pulse {
+  animation: scanPulse 0.9s ease-in-out infinite;
 }
