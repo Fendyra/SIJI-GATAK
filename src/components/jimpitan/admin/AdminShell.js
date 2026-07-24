@@ -10,7 +10,7 @@ import {
   RiwayatTransaksiScreen,
   RekapScreen,
   SettingScreen,
-} from "./adminScreens";
+} from "./screens";
 
 export default function AdminShell({ vm }) {
   return (

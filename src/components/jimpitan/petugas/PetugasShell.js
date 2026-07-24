@@ -1,6 +1,6 @@
 "use client";
 
-import { Dashboard, ListScreen, ScanScreen, DetailScreen, RiwayatScreen } from "./petugasScreens";
+import { Dashboard, ListScreen, ScanScreen, DetailScreen, RiwayatScreen } from "./screens";
 
 export default function PetugasShell({ vm }) {
   return (
