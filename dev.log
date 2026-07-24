@@ -1,0 +1,11 @@
+
+> jimpitan-online@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.2.10 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.131.39:3000
+- Environments: .env.local
+✓ Ready in 313ms
+
+ GET / 200 in 1314ms (next.js: 1210ms, application-code: 104ms)

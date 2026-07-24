@@ -3,6 +3,18 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { toRupiah } from "@/lib/jimpitanData";
 
+const ADMIN_NAV_DEFS = [
+  { key: "admin-dashboard", label: "Dashboard" },
+  { key: "admin-rt", label: "Data RT" },
+  { key: "admin-kelompok", label: "Data Kelompok" },
+  { key: "admin-rumah", label: "Data Rumah" },
+  { key: "admin-qr", label: "QR Code Rumah" },
+  { key: "admin-petugas", label: "Akun Petugas" },
+  { key: "admin-riwayat", label: "Riwayat Transaksi" },
+  { key: "admin-rekap", label: "Rekapitulasi & Laporan" },
+  { key: "admin-setting", label: "Pengaturan" },
+];
+
 function normalizeRumah(r) {
   return {
     id: r.id,
