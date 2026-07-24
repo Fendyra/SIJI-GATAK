@@ -64,10 +64,8 @@ export async function POST(request) {
       );
     }
 
-    // Generate QR code unik: format URL
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const qr_id = `QR-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-    const qr_code = `${appUrl}/scan/${qr_id}`;
+    // Generate QR code unik (hanya menyimpan ID, URL akan dibentuk dinamis di klien)
+    const qr_code = `QR-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
     const { data, error } = await supabase
       .from("rumah")

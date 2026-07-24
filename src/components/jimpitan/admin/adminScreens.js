@@ -490,7 +490,7 @@ export function QrScreen({ vm }) {
                     <div key={h.id} className="animate-fade-in-up rounded-[14px] border border-card-border bg-white p-3.5 text-center transition-[transform,box-shadow] hover:-translate-y-[3px] hover:shadow-[0_12px_26px_-16px_rgba(28,36,32,0.35)]"
                       style={{ animationDelay: `${index * 10}ms` }}>
                       <div className="mb-2 flex aspect-square w-full items-center justify-center rounded-[10px] bg-[#f6f4ee]">
-                        <QrCanvas value={h.qr_code} size={110} id={canvasId} />
+                        <QrCanvas value={`${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${h.qr_code?.split('/').pop()}`} size={110} id={canvasId} />
                         <canvas data-qr-canvas="true" data-nama={h.nama?.replace(/[^a-zA-Z0-9 ]/g, "") || "rumah"} id={`qr-dl-${h.id}`} style={{ display: "none" }} />
                       </div>
                       <div className="text-[13px] font-bold leading-tight">{h.nama}</div>
