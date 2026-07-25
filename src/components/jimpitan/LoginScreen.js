@@ -32,7 +32,7 @@ export default function LoginScreen({
         <div className="mb-10 flex flex-col items-center text-center">
           <div className="mb-4 flex flex-col items-center justify-center">
             <img 
-              src="/logo.png" 
+              src="/logo-siji.png" 
               alt="Logo SIJI GATAK" 
               className="h-24 w-auto object-contain"
             />
