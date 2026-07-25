@@ -35,14 +35,14 @@ export default function LoginScreen({
         <form onSubmit={onSubmit}>
           <div className="mb-[14px]">
             <label className="mb-1.5 block text-[13px] font-semibold text-label">
-              Email atau Username
+              Username
             </label>
             <input
               id="login-username"
               type="text"
               value={username}
               onChange={onUsernameChange}
-              placeholder="mis. petugas@gmail.com atau budi"
+              placeholder="mis. kelompok4"
               autoComplete="username"
               className="w-full rounded-[10px] border border-input-border px-3.5 py-3 font-sans text-[15px] transition-colors focus:border-brand focus:outline-none"
             />

@@ -88,10 +88,10 @@ export function PetugasAkunScreen({ vm }) {
 
       {isModalOpen && (
         <Modal onClose={vm.closeModal}>
-          <ModalHeader title={isAdd ? "Tambah Akun Baru" : "Ubah Data Akun"} subtitle={isAdd ? "Akun baru akan bisa login menggunakan email yang diisi." : undefined} />
+          <ModalHeader title={isAdd ? "Tambah Akun Baru" : "Ubah Data Akun"} subtitle={isAdd ? "Akun baru bisa login menggunakan username yang diisi." : undefined} />
           <InputField label="Nama Lengkap" value={d.nama} onChange={(e) => vm.onModalDataChange("nama", e.target.value)} placeholder="mis. Budi Santoso" />
           {isAdd && <>
-            <InputField label="Email (digunakan untuk login)" type="email" value={d.email} onChange={(e) => vm.onModalDataChange("email", e.target.value)} placeholder="mis. budi@gmail.com" />
+            <InputField label="Username (digunakan untuk login)" type="text" value={d.username} onChange={(e) => vm.onModalDataChange("username", e.target.value.replace(/\s/g, '').toLowerCase())} placeholder="mis. budi123" />
             <InputField label="Password" type="password" value={d.password} onChange={(e) => vm.onModalDataChange("password", e.target.value)} placeholder="min. 6 karakter" />
             <SelectField label="Role" value={d.role} onChange={(e) => vm.onModalDataChange("role", e.target.value)}>
               <option value="petugas">Petugas</option>

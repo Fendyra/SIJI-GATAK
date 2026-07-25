@@ -608,7 +608,7 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   // ── CRUD Petugas ──────────────────────────────────────────────────────────
   async function savePetugas() {
-    const { id, nama, email, password: pwd, kelompok_id, role: pRole } = modalData;
+    const { id, nama, username, password: pwd, kelompok_id, role: pRole } = modalData;
     if (id) {
       if (!nama?.trim()) { showToast("Nama harus diisi."); return; }
       setIsLoading(true);
@@ -619,14 +619,13 @@ export default function useJimpitanViewModel(hasSession = true) {
       } catch (err) { showToast("Gagal: " + err.message); }
       finally { setIsLoading(false); }
     } else {
-      if (!nama?.trim() || !email?.trim() || !pwd?.trim()) { showToast("Nama, email, dan password harus diisi."); return; }
+      if (!nama?.trim() || !username?.trim() || !pwd?.trim()) { showToast("Nama, username, dan password harus diisi."); return; }
       if (!kelompok_id && pRole !== "admin") { showToast("Kelompok harus dipilih untuk petugas."); return; }
       setIsLoading(true);
       try {
-        const username = email.trim().split("@")[0].toLowerCase();
         const res = await apiFetch("/api/petugas", {
           method: "POST",
-          body: JSON.stringify({ nama: nama.trim(), username, email: email.trim(), password: pwd, kelompok_id: kelompok_id || null, role: pRole || "petugas" }),
+          body: JSON.stringify({ nama: nama.trim(), username: username.trim(), password: pwd, kelompok_id: kelompok_id || null, role: pRole || "petugas" }),
         });
         setPetugasAccounts([...petugasAccounts, res.data]);
         showToast("Akun berhasil dibuat."); closeModal();
