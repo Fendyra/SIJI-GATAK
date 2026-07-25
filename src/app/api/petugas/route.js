@@ -68,8 +68,8 @@ export async function POST(request) {
       });
 
     if (authError) {
-      if (authError.message?.includes("already registered")) {
-        return Response.json({ error: "Email/username sudah digunakan." }, { status: 409 });
+      if (authError.message?.toLowerCase().includes("already")) {
+        return Response.json({ error: "Username sudah terdaftar di sistem. Gunakan username lain (misal: " + finalUsername + "2)." }, { status: 409 });
       }
       throw authError;
     }
