@@ -93,6 +93,9 @@ export async function POST(request) {
 
     if (profilError) {
       await adminSupabase.auth.admin.deleteUser(authUser.user.id);
+      if (profilError.message?.includes("petugas_username_key") || profilError.code === "23505") {
+        return Response.json({ error: "Username sudah digunakan oleh akun lain. Silakan pilih username yang berbeda." }, { status: 409 });
+      }
       throw profilError;
     }
 
