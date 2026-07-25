@@ -266,6 +266,7 @@ export default function useJimpitanViewModel(hasSession = true) {
   async function apiFetch(url, options = {}) {
     const res = await fetch(url, {
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
       ...options,
     });
     const json = await res.json();
