@@ -30,14 +30,14 @@ export default function LoginScreen({
 
         {/* Logo Section */}
         <div className="mb-2 flex flex-col items-center text-center">
-          <div className="-mt-4 flex flex-col items-center justify-center">
+          <div className="-mt-2 flex flex-col items-center justify-center">
             <img
               src="/logo.png"
               alt="Logo SIJI GATAK"
-              className="h-48 w-auto object-contain scale-110"
+              className="h-52 w-auto object-contain scale-110"
             />
           </div>
-          <p className="-mt-10 text-sm font-medium text-gray-500 relative z-10">
+          <p className="-mt-14 mb-6 text-sm font-medium text-gray-500 relative z-10">
             Sistem Informasi Jimpitan<br />Dusun Gatak
           </p>
         </div>
@@ -165,9 +165,6 @@ export default function LoginScreen({
 
       {/* Footer */}
       <div className="absolute bottom-6 left-0 right-0 text-center">
-        <div className="mb-1 flex items-center justify-center gap-1.5 text-xs font-medium text-gray-500">
-          Sistem Informasi Jimpitan Online Dusun Gatak
-        </div>
         <div className="text-[11px] text-gray-400">
           &copy; 2026 SIJI GATAK &ndash; KKN UPNYK 84.036
         </div>
