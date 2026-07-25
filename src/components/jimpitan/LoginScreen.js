@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 export default function LoginScreen({
   username,
   password,
@@ -9,83 +11,177 @@ export default function LoginScreen({
   onPasswordChange,
   onSubmit,
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-6">
-      {/* Background blobs */}
+    <div className="relative flex min-h-screen items-center justify-center bg-[#f9fafb] p-6 font-sans">
+      {/* Background Ornaments (Dots & Blobs) */}
+      <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-tr-full bg-brand/5" />
       <div
-        className="pointer-events-none absolute -top-35 -right-30 h-[380px] w-[380px] rounded-full"
-        style={{ background: "radial-gradient(circle, #1f7a4d22, transparent 70%)" }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-40 -left-25 h-[360px] w-[360px] rounded-full"
-        style={{ background: "radial-gradient(circle, #c1652f1c, transparent 70%)" }}
+        className="pointer-events-none absolute right-4 bottom-4 h-48 w-48 opacity-20"
+        style={{
+          backgroundImage: "radial-gradient(#1f7a4d 2px, transparent 2px)",
+          backgroundSize: "16px 16px",
+        }}
       />
 
-      <div className="animate-pop-in relative w-full max-w-[380px] rounded-[22px] border border-card-border bg-white p-[38px_32px] shadow-[0_24px_60px_-24px_rgba(28,36,32,0.3)]">
-        {/* Logo */}
-        <div className="mb-[18px] flex h-[52px] w-[52px] items-center justify-center rounded-[15px] bg-gradient-to-br from-brand to-brand-deep shadow-[0_10px_20px_-8px_#1f7a4d66]">
-          <span className="font-display text-[22px] font-extrabold text-white">J</span>
+      <div className="animate-pop-in relative w-full max-w-[420px] rounded-3xl bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-10">
+        
+        {/* Logo Section */}
+        <div className="mb-10 flex flex-col items-center text-center">
+          <div className="mb-4 flex flex-col items-center justify-center">
+            {/* Custom SVG Logo based on the screenshot (House + Piggy/Coin) */}
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 4L4 26V60H60V26L32 4Z" stroke="#1f7a4d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M26 16H38V26H26V16Z" fill="#1f7a4d"/>
+              <circle cx="32" cy="38" r="12" fill="#fbbf24"/>
+              <text x="32" y="42" fontSize="12" fill="#fff" fontWeight="bold" textAnchor="middle">Rp</text>
+              <path d="M16 46C16 46 22 56 32 56C42 56 48 46 48 46" stroke="#1f7a4d" strokeWidth="4" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h1 className="font-display text-2xl font-black tracking-tight text-gray-900">
+            <span className="text-brand">SIJI</span> GATAK
+          </h1>
+          <p className="mt-1 text-sm font-medium text-gray-500">
+            Sistem Informasi Jimpitan<br />Dusun Gatak
+          </p>
         </div>
 
-        <div className="font-display mb-1 text-[23px] font-extrabold tracking-tight">
-          Jimpitan Online
+        {/* Greeting Section */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Selamat datang!</h2>
+          <p className="mt-1 text-sm text-gray-500">Silakan masuk untuk melanjutkan</p>
         </div>
-        <div className="mb-6 text-sm text-muted">Masuk menggunakan akun Anda</div>
 
         <form onSubmit={onSubmit}>
-          <div className="mb-[14px]">
-            <label className="mb-1.5 block text-[13px] font-semibold text-label">
-              Username
+          {/* Username Input */}
+          <div className="mb-4">
+            <label className="mb-1.5 block text-sm font-bold text-gray-800">
+              Email atau Username
             </label>
-            <input
-              id="login-username"
-              type="text"
-              value={username}
-              onChange={onUsernameChange}
-              placeholder="mis. kelompok4"
-              autoComplete="username"
-              className="w-full rounded-[10px] border border-input-border px-3.5 py-3 font-sans text-[15px] transition-colors focus:border-brand focus:outline-none"
-            />
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+              </div>
+              <input
+                id="login-username"
+                type="text"
+                value={username}
+                onChange={onUsernameChange}
+                placeholder="Masukkan email atau username"
+                autoComplete="username"
+                className="w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-11 text-[15px] font-medium text-gray-900 transition-all focus:border-brand focus:ring-1 focus:ring-brand focus:outline-none"
+              />
+            </div>
           </div>
 
-          <div className="mb-2">
-            <label className="mb-1.5 block text-[13px] font-semibold text-label">
+          {/* Password Input */}
+          <div className="mb-5">
+            <label className="mb-1.5 block text-sm font-bold text-gray-800">
               Password
             </label>
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={onPasswordChange}
-              placeholder="••••••••"
-              autoComplete="current-password"
-              className="w-full rounded-[10px] border border-input-border px-3.5 py-3 font-sans text-[15px] transition-colors focus:border-brand focus:outline-none"
-            />
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z" />
+                </svg>
+              </div>
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={onPasswordChange}
+                placeholder="Masukkan password"
+                autoComplete="current-password"
+                className="w-full rounded-xl border border-gray-200 bg-white py-3 pr-11 pl-11 text-[15px] font-medium text-gray-900 transition-all focus:border-brand focus:ring-1 focus:ring-brand focus:outline-none"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3.5 text-gray-400 hover:text-gray-600 focus:outline-none"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.28 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2.01 3.87l2.68 2.68C3.06 7.83 1.77 9.53 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l4.2 4.2 1.41-1.41L3.42 2.45 2.01 3.87zm7.5 7.5l2.61 2.61c-.04.14-.06.27-.06.4 0 1.66 1.34 3 3 3 .15 0 .28-.02.42-.06l2.61 2.61c-.88.36-1.85.57-2.88.57-2.76 0-5-2.24-5-5 0-1.03.21-2 .57-2.88z" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Remember Me */}
+          <div className="mb-6 flex items-center">
+            <label className="flex cursor-pointer items-center gap-2">
+              <div
+                className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
+                  rememberMe ? "border-brand bg-brand" : "border-gray-300 bg-white"
+                }`}
+                onClick={() => setRememberMe(!rememberMe)}
+              >
+                {rememberMe && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                )}
+              </div>
+              <span className="text-sm font-semibold text-gray-800 select-none" onClick={() => setRememberMe(!rememberMe)}>Ingat saya</span>
+            </label>
           </div>
 
           {loginError ? (
-            <div className="animate-fade-in-up mt-2 mb-1 rounded-[8px] bg-danger-bg px-3 py-2 text-[13px] font-semibold text-danger">
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600">
               {loginError}
             </div>
           ) : null}
 
-          <div className="mt-3 mb-[18px] flex items-center gap-2 text-xs text-muted-2">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="flex-shrink-0">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M8 7v5M8 5h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            Sistem akan mendeteksi hak akses Anda secara otomatis.
-          </div>
-
+          {/* Submit Button */}
           <button
             id="login-submit"
             type="submit"
             disabled={isLoading}
-            className="w-full cursor-pointer rounded-[10px] border-none bg-brand py-[13px] text-[15px] font-bold text-white shadow-[0_10px_20px_-10px_#1f7a4d80] transition-[background,transform] duration-150 hover:bg-brand-dark active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-none bg-[#166534] py-3.5 text-[15px] font-bold text-white transition-all duration-200 hover:bg-[#14532d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isLoading ? "Memverifikasi…" : "Masuk"}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 animate-spin text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memverifikasi...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                Masuk
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className=" transition-transform group-hover:translate-x-1">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            )}
           </button>
         </form>
+      </div>
+
+      {/* Footer */}
+      <div className="absolute bottom-6 left-0 right-0 text-center">
+        <div className="mb-1 flex items-center justify-center gap-1.5 text-xs font-medium text-gray-500">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <polyline points="9 12 11 14 15 10"></polyline>
+          </svg>
+          Sistem aman dan terpercaya
+        </div>
+        <div className="text-[11px] text-gray-400">
+          &copy; 2026 Jimpitan Online &ndash; Dusun Gatak
+        </div>
       </div>
     </div>
   );
