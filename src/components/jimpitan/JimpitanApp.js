@@ -111,7 +111,7 @@ function ProfileModal({ currentUser, onClose, onSave }) {
 
 const PETUGAS_SCREENS = ["dashboard", "list", "scan", "detail", "riwayat"];
 
-export default function JimpitanApp() {
+export default function JimpitanApp({ hasSession = true }) {
   const {
     vm,
     screen, setScreen,
@@ -125,7 +125,7 @@ export default function JimpitanApp() {
     toast,
     handleLogin,
     showToast
-  } = useJimpitanViewModel();
+  } = useJimpitanViewModel(hasSession);
 
   if (isCheckingSession) {
     return (

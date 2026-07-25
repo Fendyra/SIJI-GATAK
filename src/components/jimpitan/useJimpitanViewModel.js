@@ -151,13 +151,13 @@ function ProfileModal({ currentUser, onClose, onSave }) {
   );
 }
 
-export default function useJimpitanViewModel() {
+export default function useJimpitanViewModel(hasSession = true) {
   const [screen, setScreen] = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isMobile, setIsMobile] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isCheckingSession, setIsCheckingSession] = useState(hasSession);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [activeSesiId, setActiveSesiId] = useState(null);
