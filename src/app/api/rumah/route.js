@@ -1,5 +1,6 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
 /**
  * GET /api/rumah
  * Query params:

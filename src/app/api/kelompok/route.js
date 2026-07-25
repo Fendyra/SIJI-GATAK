@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
 /**
  * GET /api/kelompok
  * Ambil semua kelompok beserta data RT-nya

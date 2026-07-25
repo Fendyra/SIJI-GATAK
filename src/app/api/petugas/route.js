@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
 /**
  * GET /api/petugas
  * Ambil semua akun petugas beserta kelompok dan RT

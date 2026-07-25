@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
 /**
  * GET /api/pengaturan
  * Ambil pengaturan global (singleton)
