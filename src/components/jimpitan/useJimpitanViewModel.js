@@ -675,11 +675,11 @@ export default function useJimpitanViewModel(hasSession = true) {
       });
       const newTx = normalizeTx(res.data);
       const time = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-      setHouses(houses.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+      setHouses((prev) => prev.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
       if (rawHouses.length > 0) {
-        setRiwayatTransactions(riwayatTransactions.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+        setRiwayatTransactions((prev) => prev.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
       }
-      setTransactions([newTx, ...transactions]);
+      setTransactions((prev) => [newTx, ...prev]);
       setScreen("dashboard");
       showToast("Scan berhasil! Transaksi tersimpan.");
     } catch (err) { showToast("Gagal menyimpan transaksi: " + err.message); }
@@ -716,11 +716,11 @@ export default function useJimpitanViewModel(hasSession = true) {
       });
       const newTx = normalizeTx(res.data);
       const time = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-      setHouses(houses.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+      setHouses((prev) => prev.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
       if (rawHouses.length > 0) {
-        setRiwayatTransactions(riwayatTransactions.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+        setRiwayatTransactions((prev) => prev.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
       }
-      setTransactions([newTx, ...transactions]);
+      setTransactions((prev) => [newTx, ...prev]);
       setScreen("list");
       showToast(status === "sudah" ? "Transaksi tersimpan." : "Rumah ditandai kosong.");
     } catch (err) { showToast("Gagal menyimpan transaksi: " + err.message); }
@@ -738,7 +738,7 @@ export default function useJimpitanViewModel(hasSession = true) {
         method: "PATCH",
         body: JSON.stringify({ id: correctionTxId, nominal: Number(correctionNominal) || 0, status: "sudah" }),
       });
-      setTransactions(transactions.map((t) => t.id === correctionTxId ? { ...t, nominal: res.data.nominal, status: res.data.status } : t));
+      setTransactions((prev) => prev.map((t) => t.id === correctionTxId ? { ...t, nominal: res.data.nominal, status: res.data.status } : t));
       setCorrectionTxId(null);
       showToast("Transaksi berhasil dikoreksi.");
     } catch (err) { showToast("Gagal koreksi: " + err.message); }
@@ -750,17 +750,16 @@ export default function useJimpitanViewModel(hasSession = true) {
     setIsLoading(true);
     try {
       await apiFetch(`/api/transaksi?id=${correctionTxId}`, { method: "DELETE" });
-      setTransactions(transactions.filter(t => t.id !== correctionTxId));
+      setTransactions((prev) => prev.filter(t => t.id !== correctionTxId));
       
       const houseId = transactions.find(t => t.id === correctionTxId)?.rumah_id;
       if (houseId) {
-        setHouses(houses.map((h) => h.id === houseId ? { ...h, status: "belum", lastNominal: 0, lastTime: "" } : h));
+        setHouses((prev) => prev.map((h) => h.id === houseId ? { ...h, status: "belum", lastNominal: 0, lastTime: "" } : h));
       }
       
       // Update rawHouses as well for riwayat
       if (rawHouses.length > 0 && houseId) {
-        const tx = transactions.find(t => t.id === correctionTxId);
-        setRiwayatTransactions(riwayatTransactions.map((h) => 
+        setRiwayatTransactions((prev) => prev.map((h) => 
           h.id === houseId ? { ...h, status: "belum", lastNominal: 0, lastTime: "" } : h
         ));
       }
