@@ -157,6 +157,7 @@ export default function useJimpitanViewModel() {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [activeSesiId, setActiveSesiId] = useState(null);
@@ -375,10 +376,12 @@ export default function useJimpitanViewModel() {
         });
         const sesiId = sesiRes.data?.id;
         setActiveSesiId(sesiId);
-        if (sesiId) {
-          const txRes = await apiFetch(`/api/transaksi?sesi_id=${sesiId}`);
-          const txList = txRes.data || [];
-          setTransactions(txList.map(normalizeTx));
+        
+        // Fetch ALL transactions for today, not just this session, 
+        // to enable global progress tracking for all Petugas
+        const txRes = await apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&limit=1000`);
+        const txList = txRes.data || [];
+        setTransactions(txList.map(normalizeTx));
           const txMap = {};
           txList.forEach((t) => { txMap[t.rumah_id || t.rumah?.id] = t; });
           setHouses(rawHousesData.map((h) => {
@@ -391,9 +394,6 @@ export default function useJimpitanViewModel() {
               lastTime: new Date(tx.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
             };
           }));
-        } else {
-          setHouses(rawHousesData);
-        }
       }
     } catch (err) {
       console.error("fetchAllData error:", err);
@@ -454,11 +454,15 @@ export default function useJimpitanViewModel() {
         }
       } catch (err) {
         // Not logged in, stay on login screen
+      } finally {
+        setIsCheckingSession(false);
       }
     }
     // Only check if we are currently unauthenticated
     if (!currentUser && screen === "login") {
       checkSession();
+    } else {
+      setIsCheckingSession(false);
     }
   }, []);
 
@@ -930,6 +934,7 @@ export default function useJimpitanViewModel() {
     password, setPassword,
     loginError, setLoginError,
     isLoading, setIsLoading,
+    isCheckingSession,
     currentUser, setCurrentUser,
     isProfileOpen, setIsProfileOpen,
     toast, setToast,
