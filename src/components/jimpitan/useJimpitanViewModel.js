@@ -651,7 +651,7 @@ export default function useJimpitanViewModel(hasSession = true) {
       const house = resolveQr(qrCode);
       if (!house) { setScanState("not_found"); showToast("QR Code tidak dikenali."); return; }
       if (house.status !== "belum") { setSelectedHouseId(house.id); setScreen("detail"); setScanState("idle"); return; }
-      setScreen("detail"); setSelectedHouseId(house.id); setNominalInput(house.nominalDefault); setScanState("idle");
+      setScreen("detail"); setSelectedHouseId(house.id); setNominalInput(500); setScanState("idle");
     }, 600);
   }
 
@@ -664,7 +664,12 @@ export default function useJimpitanViewModel(hasSession = true) {
   function selectHouseManual(id) {
     const house = houses.find((h) => h.id === id);
     if (!house || house.status !== "belum") return;
-    setScreen("detail"); setSelectedHouseId(id); setNominalInput(house.nominalDefault);
+    setScreen("detail"); setSelectedHouseId(id); setNominalInput(500);
+  }
+
+  function editTransactionForHouse(houseId) {
+    const tx = transactions.find((t) => t.rumah_id === houseId || t.rumah?.id === houseId);
+    if (tx) openCorrection(tx);
   }
 
   async function saveTransaction(status) {
@@ -681,6 +686,9 @@ export default function useJimpitanViewModel(hasSession = true) {
       const newTx = normalizeTx(res.data);
       const time = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
       setHouses(houses.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+      if (rawHouses.length > 0) {
+        setRiwayatTransactions(riwayatTransactions.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+      }
       setTransactions([newTx, ...transactions]);
       setScreen("list");
       showToast(status === "sudah" ? "Transaksi tersimpan." : "Rumah ditandai kosong.");
@@ -888,7 +896,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,
     isScanning: scanState === "scanning", isScanIdle: scanState === "idle", isScanEmpty: scanState === "empty", isScanNotFound: scanState === "not_found",
     scanButtonLabel: scanState === "scanning" ? "Memindai…" : "Simulasikan Scan Berhasil",
-    selectedHouse, isEditableSelected, isReadonlySelected: !!selectedHouseRaw && !isEditableSelected,
+    selectedHouse, isEditableSelected, isReadonlySelected: !!selectedHouseRaw && !isEditableSelected, editTransactionForHouse,
     nominalInput, onNominalChange: (e) => setNominalInput(e.target.value), saveSudah: () => saveTransaction("sudah"), saveKosong: () => saveTransaction("kosong"),
     riwayatFilters, riwayatFiltered, noRiwayat: riwayatFiltered.length === 0,
     isAdminDashboard: screen === "admin-dashboard", isRt: screen === "admin-rt", isKelompok: screen === "admin-kelompok",

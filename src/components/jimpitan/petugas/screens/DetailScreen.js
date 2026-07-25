@@ -52,9 +52,12 @@ export function DetailScreen({ vm }) {
             <span className="text-muted-2">Nominal</span>
             <span className="font-bold">{h.nominalDisplay}</span>
           </div>
-          <div className="border-t border-card-border pt-3 text-xs text-muted-2">
-            Transaksi sudah tercatat. Koreksi data hanya dapat dilakukan oleh Admin.
-          </div>
+          <button
+            onClick={() => vm.editTransactionForHouse(h.id)}
+            className="w-full cursor-pointer rounded-xl border border-input-border bg-white py-3 text-sm font-bold text-brand hover:bg-gray-50 transition-colors"
+          >
+            Koreksi Transaksi
+          </button>
         </div>
       ) : null}
     </div>

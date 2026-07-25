@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 
 /**
  * GET /api/rumah
@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
  */
 export async function GET(request) {
   try {
-    const supabase = await createClient();
+    const supabase = await createAdminClient();
     const { searchParams } = request.nextUrl;
 
     let query = supabase
