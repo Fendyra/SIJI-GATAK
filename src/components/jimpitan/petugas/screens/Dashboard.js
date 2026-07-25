@@ -1,65 +1,320 @@
 import React from "react";
-export function Dashboard({ vm }) {
-  return (
-    <div className="max-w-[720px]">
-      <div className="animate-fade-in-up font-display mb-0.5 text-[23px] font-extrabold">
-        Selamat bertugas, {vm.firstName}
-      </div>
-      <div className="animate-fade-in-up mb-[22px] text-sm text-muted" style={{ animationDelay: "0.05s" }}>
-        {vm.today} · {vm.kelompok} · {vm.rt}
-      </div>
+import { toRupiah } from "@/lib/jimpitanData";
 
-      <div
-        className="animate-fade-in-up mb-4 flex flex-wrap items-center gap-[22px] rounded-[18px] border border-card-border bg-white p-[22px] shadow-[0_12px_30px_-20px_rgba(28,36,32,0.2)]"
-        style={{ animationDelay: "0.1s" }}
-      >
-        <div className="relative h-[104px] w-[104px] flex-shrink-0">
-          <svg width="104" height="104" viewBox="0 0 104 104">
-            <circle cx="52" cy="52" r="44" fill="none" stroke="#f1efe7" strokeWidth="12" />
-            <circle
-              cx="52"
-              cy="52"
-              r="44"
-              fill="none"
-              stroke="#1f7a4d"
-              strokeWidth="12"
-              strokeLinecap="round"
-              strokeDasharray="276.5"
-              strokeDashoffset={vm.progressDashOffset}
-              transform="rotate(-90 52 52)"
-              style={{ transition: "stroke-dashoffset 0.6s cubic-bezier(0.22,1,0.36,1)" }}
-            />
-          </svg>
-          <div className="font-display absolute inset-0 flex items-center justify-center text-xl font-extrabold text-ink">
-            {vm.progressPct}%
+export function Dashboard({ vm }) {
+  // SVG Donut Chart calculations for "Status Pengambilan"
+  const radius = 60;
+  const circumference = 2 * Math.PI * radius;
+  
+  const selesaiPct = vm.totalHouses ? (vm.sudahCount / vm.totalHouses) * 100 : 0;
+  const belumPct = vm.totalHouses ? (vm.pendingCount / vm.totalHouses) * 100 : 0;
+  const kosongPct = vm.totalHouses ? (vm.kosongCount / vm.totalHouses) * 100 : 0;
+  
+  const selesaiDash = (selesaiPct / 100) * circumference;
+  const belumDash = (belumPct / 100) * circumference;
+  const kosongDash = (kosongPct / 100) * circumference;
+  
+  const selesaiOffset = 0; // Starts at 12 o'clock
+  const belumOffset = -selesaiDash; // Starts after selesai
+  const kosongOffset = -(selesaiDash + belumDash); // Starts after belum
+
+  // SVG Line Chart calculations for "Ringkasan Nominal"
+  const chartHeight = 160;
+  const chartWidth = 500;
+  const paddingX = 40;
+  const paddingY = 20;
+  const netWidth = chartWidth - paddingX * 2;
+  const netHeight = chartHeight - paddingY * 2;
+  
+  // Create points for line chart
+  const points = (vm.petugasTrendBars || []).map((bar, i) => {
+    const x = paddingX + (i / ((vm.petugasTrendBars || []).length - 1)) * netWidth;
+    // Prevent divide by zero if max is 0
+    const normalizedMax = vm.maxPetugasTrend || 1000;
+    const y = chartHeight - paddingY - (bar.total / normalizedMax) * netHeight;
+    return `${x},${y}`;
+  }).join(" ");
+
+  return (
+    <div className="max-w-[1000px]">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <div>
+          <div className="animate-fade-in-up font-display mb-1 text-[28px] font-extrabold flex items-center gap-2 text-gray-900">
+            Selamat bertugas, {vm.firstName} <span className="text-2xl">👋</span>
+          </div>
+          <div className="animate-fade-in-up text-sm font-medium text-gray-500" style={{ animationDelay: "0.05s" }}>
+            {vm.today} • {vm.kelompok} • {vm.rt}
           </div>
         </div>
-        <div className="min-w-[180px] flex-1">
-          <div className="mb-1.5 text-sm font-bold text-label">Progres Pengambilan Hari Ini</div>
-          <div className="mb-3.5 text-[13px] text-muted">
-            {vm.doneCount} dari {vm.totalHouses} rumah sudah dikunjungi
+        <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-sm cursor-default">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1f7a4d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Kelompok <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
-          <button
+        </div>
+      </div>
+
+      {/* 4 Top Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        {/* Progres Card (Green) */}
+        <div className="animate-fade-in-up flex flex-col justify-between rounded-[20px] bg-[#2e7d32] p-5 text-white shadow-md relative overflow-hidden" style={{ animationDelay: "0.15s" }}>
+          <div className="font-bold text-[15px] mb-4">Progres Hari Ini</div>
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="relative h-[72px] w-[72px] flex-shrink-0">
+              <svg width="72" height="72" viewBox="0 0 72 72">
+                <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" />
+                <circle
+                  cx="36"
+                  cy="36"
+                  r="30"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray="188.5"
+                  strokeDashoffset={188.5 - (188.5 * vm.progressPct) / 100}
+                  transform="rotate(-90 36 36)"
+                  style={{ transition: "stroke-dashoffset 0.8s ease-in-out" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-sm font-extrabold font-display">
+                {vm.progressPct}%
+              </div>
+            </div>
+            <div>
+              <div className="text-[17px] font-extrabold font-display leading-tight">{vm.doneCount} dari {vm.totalHouses}<br/>rumah</div>
+              <div className="text-[12px] text-white/80 font-medium">sudah dikunjungi</div>
+            </div>
+          </div>
+          <button 
             onClick={vm.goToList}
-            className="w-full cursor-pointer rounded-xl border-none bg-brand py-3.5 text-[15px] font-bold text-white shadow-[0_10px_20px_-12px_#1f7a4d80] transition-[background,transform] duration-150 hover:bg-brand-dark active:scale-[0.98]"
+            className="mt-5 w-full bg-white text-[#2e7d32] rounded-xl py-2.5 text-[13px] font-bold shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer border-none"
           >
-            Mulai Pengambilan
+            Mulai Pengambilan <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </div>
+
+        {/* Terkumpul Card */}
+        <div className="animate-fade-in-up flex flex-col justify-center rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm" style={{ animationDelay: "0.2s" }}>
+          <div className="font-bold text-[15px] mb-4 text-gray-800">Terkumpul Hari Ini</div>
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#e8f5e9] text-[#2e7d32] font-display font-black text-xl">
+              Rp
+            </div>
+            <div>
+              <div className="text-[22px] font-extrabold text-[#2e7d32] font-display leading-tight">{vm.totalTerkumpulDisplay}</div>
+              <div className="text-[12px] text-gray-400 font-medium leading-snug">Total nominal<br/>jimpitan</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Rumah Kosong Card */}
+        <div className="animate-fade-in-up flex flex-col justify-center rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm" style={{ animationDelay: "0.25s" }}>
+          <div className="font-bold text-[15px] mb-4 text-gray-800">Rumah Kosong</div>
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#fff3e0] text-[#f57c00]">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <div>
+              <div className="text-[22px] font-extrabold text-[#f57c00] font-display leading-tight">{vm.kosongCount}</div>
+              <div className="text-[12px] text-gray-400 font-medium leading-snug">Rumah tidak<br/>ditemukan</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Belum Diambil Card */}
+        <div className="animate-fade-in-up flex flex-col justify-center rounded-[20px] bg-white border border-gray-100 p-5 shadow-sm" style={{ animationDelay: "0.3s" }}>
+          <div className="font-bold text-[15px] mb-4 text-gray-800">Belum Diambil</div>
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#e3f2fd] text-[#1976d2]">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <div>
+              <div className="text-[22px] font-extrabold text-[#1976d2] font-display leading-tight">{vm.pendingCount}</div>
+              <div className="text-[12px] text-gray-400 font-medium leading-snug">Rumah belum<br/>dikunjungi</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <div className="animate-fade-in-up min-w-[140px] flex-1 rounded-[14px] border border-card-border bg-white p-4" style={{ animationDelay: "0.15s" }}>
-          <div className="mb-1.5 text-xs font-semibold text-muted-2">Terkumpul Hari Ini</div>
-          <div className="font-display text-xl font-extrabold text-brand">{vm.totalTerkumpulDisplay}</div>
+      {/* Middle Section (Charts) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        
+        {/* Line Chart */}
+        <div className="animate-fade-in-up lg:col-span-2 rounded-[20px] bg-white border border-gray-100 p-6 shadow-sm flex flex-col" style={{ animationDelay: "0.35s" }}>
+          <div className="flex justify-between items-center mb-6">
+            <div className="font-bold text-gray-800 text-[16px]">Ringkasan Nominal</div>
+            <div className="text-xs font-bold text-gray-600 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-default">
+              Hari Ini <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+          
+          <div className="flex-1 w-full overflow-hidden relative min-h-[220px]">
+            <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-full" preserveAspectRatio="none">
+              {/* Horizontal Grid lines */}
+              {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
+                const y = paddingY + ratio * netHeight;
+                return (
+                  <g key={i}>
+                    <line x1={paddingX} y1={y} x2={chartWidth} y2={y} stroke="#f3f4f6" strokeWidth="1" strokeDasharray="4,4" />
+                    <text x={paddingX - 5} y={y + 3} textAnchor="end" fontSize="10" fill="#9ca3af" fontWeight="600">
+                      {i === 4 ? "Rp0" : `Rp${Math.round((vm.maxPetugasTrend * (1 - ratio))/1000)}k`}
+                    </text>
+                  </g>
+                );
+              })}
+              
+              {/* X Axis Labels */}
+              {(vm.petugasTrendBars || []).map((bar, i) => {
+                const x = paddingX + (i / ((vm.petugasTrendBars || []).length - 1)) * netWidth;
+                return (
+                  <text key={i} x={x} y={chartHeight - 2} textAnchor="middle" fontSize="10" fill="#9ca3af" fontWeight="600">
+                    {bar.hour}
+                  </text>
+                );
+              })}
+              
+              {/* Data Line */}
+              <polyline 
+                points={points}
+                fill="none"
+                stroke="#2e7d32"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              
+              {/* Data Points */}
+              {(vm.petugasTrendBars || []).map((bar, i) => {
+                const x = paddingX + (i / ((vm.petugasTrendBars || []).length - 1)) * netWidth;
+                const normalizedMax = vm.maxPetugasTrend || 1000;
+                const y = chartHeight - paddingY - (bar.total / normalizedMax) * netHeight;
+                return (
+                  <circle key={i} cx={x} cy={y} r="4" fill="#2e7d32" stroke="#fff" strokeWidth="2" />
+                );
+              })}
+            </svg>
+          </div>
+          <div className="mt-4 flex justify-center items-center gap-2 text-xs font-bold text-gray-500">
+            <div className="w-4 h-0.5 bg-[#2e7d32]"></div> Terkumpul
+          </div>
         </div>
-        <div className="animate-fade-in-up min-w-[140px] flex-1 rounded-[14px] border border-card-border bg-white p-4" style={{ animationDelay: "0.2s" }}>
-          <div className="mb-1.5 text-xs font-semibold text-muted-2">Rumah Kosong</div>
-          <div className="font-display text-xl font-extrabold text-warn">{vm.kosongCount}</div>
+
+        {/* Donut Chart */}
+        <div className="animate-fade-in-up rounded-[20px] bg-white border border-gray-100 p-6 shadow-sm flex flex-col" style={{ animationDelay: "0.4s" }}>
+          <div className="font-bold text-gray-800 text-[16px] mb-6">Status Pengambilan</div>
+          
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="relative w-[160px] h-[160px] mb-8">
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                {/* Background circle */}
+                <circle cx="80" cy="80" r={radius} fill="none" stroke="#f3f4f6" strokeWidth="18" />
+                
+                {/* Kosong (Orange) */}
+                {kosongPct > 0 && (
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r={radius}
+                    fill="none"
+                    stroke="#f57c00"
+                    strokeWidth="18"
+                    strokeDasharray={`${kosongDash} ${circumference}`}
+                    strokeDashoffset={kosongOffset}
+                    transform="rotate(-90 80 80)"
+                  />
+                )}
+                
+                {/* Belum (Blue) */}
+                {belumPct > 0 && (
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r={radius}
+                    fill="none"
+                    stroke="#1976d2"
+                    strokeWidth="18"
+                    strokeDasharray={`${belumDash} ${circumference}`}
+                    strokeDashoffset={belumOffset}
+                    transform="rotate(-90 80 80)"
+                  />
+                )}
+                
+                {/* Selesai (Green) */}
+                {selesaiPct > 0 && (
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r={radius}
+                    fill="none"
+                    stroke="#2e7d32"
+                    strokeWidth="18"
+                    strokeDasharray={`${selesaiDash} ${circumference}`}
+                    strokeDashoffset={selesaiOffset}
+                    transform="rotate(-90 80 80)"
+                  />
+                )}
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="font-display text-2xl font-black text-gray-900">{Math.round(selesaiPct)}%</div>
+                <div className="text-[11px] font-bold text-gray-500">Selesai</div>
+              </div>
+            </div>
+            
+            <div className="w-full flex flex-col gap-3 px-2">
+              <div className="flex justify-between items-center text-[12px] font-semibold text-gray-600">
+                <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-[#2e7d32]"></div> Selesai</div>
+                <div>{vm.sudahCount} ({Math.round(selesaiPct)}%)</div>
+              </div>
+              <div className="flex justify-between items-center text-[12px] font-semibold text-gray-600">
+                <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-[#1976d2]"></div> Belum Diambil</div>
+                <div>{vm.pendingCount} ({Math.round(belumPct)}%)</div>
+              </div>
+              <div className="flex justify-between items-center text-[12px] font-semibold text-gray-600">
+                <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-[#f57c00]"></div> Rumah Kosong</div>
+                <div>{vm.kosongCount} ({Math.round(kosongPct)}%)</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="animate-fade-in-up min-w-[140px] flex-1 rounded-[14px] border border-card-border bg-white p-4" style={{ animationDelay: "0.25s" }}>
-          <div className="mb-1.5 text-xs font-semibold text-muted-2">Belum Diambil</div>
-          <div className="font-display text-xl font-extrabold">{vm.pendingCount}</div>
+      </div>
+
+      {/* Bottom Section (Aksi Cepat) */}
+      <div className="animate-fade-in-up rounded-[20px] bg-white border border-gray-100 p-6 shadow-sm" style={{ animationDelay: "0.45s" }}>
+        <div className="font-bold text-gray-800 text-[16px] mb-4">Aksi Cepat</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button 
+            onClick={vm.openScan}
+            className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:border-[#2e7d32] hover:bg-[#f1f8f2] cursor-pointer transition-colors group text-left bg-white"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#2e7d32] rounded-xl flex items-center justify-center text-white shadow-sm">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+              </div>
+              <div>
+                <div className="font-bold text-[15px] text-gray-900 group-hover:text-[#2e7d32]">Mulai Pengambilan</div>
+                <div className="text-[12px] font-medium text-gray-500">Scan QR rumah untuk memulai</div>
+              </div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-[#2e7d32] transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          
+          <button 
+            onClick={() => vm.goToRiwayat ? vm.goToRiwayat() : null}
+            className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:border-[#2e7d32] hover:bg-[#f1f8f2] cursor-pointer transition-colors group text-left bg-white"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#e8f5e9] text-[#2e7d32] rounded-xl flex items-center justify-center shadow-sm">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </div>
+              <div>
+                <div className="font-bold text-[15px] text-gray-900 group-hover:text-[#2e7d32]">Lihat Riwayat</div>
+                <div className="text-[12px] font-medium text-gray-500">Lihat daftar pengambilan sebelumnya</div>
+              </div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-[#2e7d32] transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
         </div>
       </div>
     </div>

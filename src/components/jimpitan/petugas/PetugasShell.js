@@ -8,12 +8,12 @@ export default function PetugasShell({ vm }) {
       {vm.isDesktop ? (
         <div className="sticky top-0 flex h-screen w-[240px] flex-shrink-0 flex-col border-r border-card-border bg-white px-4 py-6">
           <div className="flex items-center gap-2.5 px-2 pb-5">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-brand to-brand-deep shadow-[0_6px_14px_-6px_#1f7a4d80]">
-              <span className="font-display text-base font-extrabold text-white">J</span>
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain scale-125" />
             </div>
             <div>
-              <div className="font-display text-sm leading-tight font-extrabold">Jimpitan Online</div>
-              <div className="text-[11px] text-muted-2">{vm.kelompok}</div>
+              <div className="font-display text-sm leading-tight font-extrabold text-gray-900">Jimpitan Online</div>
+              <div className="text-[11px] text-muted-2">Dusun Gatak</div>
             </div>
           </div>
           <div className="flex flex-col gap-1">
@@ -52,13 +52,17 @@ export default function PetugasShell({ vm }) {
 
       {vm.isMobile ? (
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-card-border bg-white px-[18px] py-3.5">
-          <button onClick={vm.openProfile} className="text-left cursor-pointer hover:opacity-80 transition-opacity flex flex-col items-start rounded-lg p-1 -ml-1">
-            <div className="text-[15px] font-extrabold flex items-center gap-1.5">
-              Jimpitan Online 
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1f7a4d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <button onClick={vm.openProfile} className="text-left cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2 rounded-lg -ml-1">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain scale-125" />
             </div>
-            <div className="text-[11px] text-muted-2 font-semibold">
-              {vm.petugasName} · {vm.rt}
+            <div className="flex flex-col">
+              <div className="text-[14px] font-extrabold flex items-center gap-1.5 text-gray-900">
+                Jimpitan Online 
+              </div>
+              <div className="text-[10px] text-muted-2 font-semibold mt-0.5">
+                {vm.petugasName} · {vm.rt}
+              </div>
             </div>
           </button>
           <button onClick={vm.logout} className="cursor-pointer border-none bg-transparent text-[13px] font-bold text-danger">
