@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ScanClient({ rumah, kode, petugasId, kelompokId, petugas }) {
@@ -9,6 +9,7 @@ export default function ScanClient({ rumah, kode, petugasId, kelompokId, petugas
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
 
   async function submitTransaksi(isKosong) {
     if (isLoading) return;
@@ -56,6 +57,17 @@ export default function ScanClient({ rumah, kode, petugasId, kelompokId, petugas
       setIsLoading(false);
     }
   }
+
+  // Auto submit when page loads
+  useEffect(() => {
+    if (!hasAutoSubmitted) {
+      setHasAutoSubmitted(true);
+      const timer = setTimeout(() => {
+        submitTransaksi(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasAutoSubmitted]);
 
   if (success) {
     return (

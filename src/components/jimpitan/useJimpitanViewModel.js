@@ -651,8 +651,35 @@ export default function useJimpitanViewModel(hasSession = true) {
       const house = resolveQr(qrCode);
       if (!house) { setScanState("not_found"); showToast("QR Code tidak dikenali."); return; }
       if (house.status !== "belum") { setSelectedHouseId(house.id); setScreen("detail"); setScanState("idle"); return; }
-      setScreen("detail"); setSelectedHouseId(house.id); setNominalInput(500); setScanState("idle");
+      
+      // Auto-save transaction for successful scan
+      setSelectedHouseId(house.id); 
+      setNominalInput(500); 
+      setScanState("idle");
+      autoSaveTransaction(house, 500, "sudah");
     }, 600);
+  }
+
+  async function autoSaveTransaction(house, nominal, status) {
+    if (!currentUser) return;
+    if (!activeSesiId) { showToast("Sesi ronda belum aktif. Coba logout dan login ulang."); return; }
+    setIsLoading(true);
+    try {
+      const res = await apiFetch("/api/transaksi", {
+        method: "POST",
+        body: JSON.stringify({ sesi_id: activeSesiId, rumah_id: house.id, petugas_id: currentUser.id, nominal, status }),
+      });
+      const newTx = normalizeTx(res.data);
+      const time = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+      setHouses(houses.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+      if (rawHouses.length > 0) {
+        setRiwayatTransactions(riwayatTransactions.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
+      }
+      setTransactions([newTx, ...transactions]);
+      setScreen("dashboard");
+      showToast("Scan berhasil! Transaksi tersimpan.");
+    } catch (err) { showToast("Gagal menyimpan transaksi: " + err.message); }
+    finally { setIsLoading(false); }
   }
 
   function simulateScan() {
