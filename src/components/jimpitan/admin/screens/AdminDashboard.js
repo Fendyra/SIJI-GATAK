@@ -5,8 +5,33 @@ import { Modal, ModalHeader, ModalFooter, ConfirmDelete, InputField, SelectField
 export function AdminDashboard({ vm }) {
   return (
     <div className="max-w-[960px]">
-      <div className="font-display mb-0.5 text-[22px] font-extrabold">Ringkasan</div>
-      <div className="mb-[22px] text-sm text-muted">{vm.today} · Periode berjalan (bulan ini)</div>
+      <div className="font-display mb-0.5 text-[22px] font-extrabold flex justify-between items-center">
+        <span>Ringkasan</span>
+        <div className="flex gap-2">
+          <select 
+            value={vm.adminDashboardMonth} 
+            onChange={(e) => vm.setAdminDashboardMonth(e.target.value)}
+            className="rounded-lg border border-input-border bg-white px-3 py-1.5 text-sm font-bold text-brand-deep cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand"
+          >
+            {[...Array(12)].map((_, i) => {
+              const val = (i + 1).toString().padStart(2, '0');
+              const label = new Date(2000, i, 1).toLocaleString('id-ID', { month: 'long' });
+              return <option key={val} value={val}>{label}</option>;
+            })}
+          </select>
+          <select
+            value={vm.adminDashboardYear}
+            onChange={(e) => vm.setAdminDashboardYear(e.target.value)}
+            className="rounded-lg border border-input-border bg-white px-3 py-1.5 text-sm font-bold text-brand-deep cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand"
+          >
+            {[...Array(5)].map((_, i) => {
+              const year = (new Date().getFullYear() - 2) + i;
+              return <option key={year} value={year}>{year}</option>;
+            })}
+          </select>
+        </div>
+      </div>
+      <div className="mb-[22px] text-sm text-muted">{vm.today} · Data ringkasan berdasarkan periode terpilih</div>
 
       <div className="mb-5 flex flex-wrap gap-3">
         <div className="min-w-[160px] flex-1 rounded-[14px] border border-card-border bg-white p-[18px]">

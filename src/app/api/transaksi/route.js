@@ -139,3 +139,31 @@ export async function PATCH(request) {
     return Response.json({ error: err.message }, { status: 500 });
   }
 }
+
+/**
+ * DELETE /api/transaksi?id=xxx
+ * Hapus transaksi (digunakan saat petugas melakukan pembatalan)
+ */
+export async function DELETE(request) {
+  try {
+    const supabase = await createClient();
+    const { searchParams } = request.nextUrl;
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return Response.json({ error: "id transaksi wajib diisi." }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from("transaksi")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE /api/transaksi]", err);
+    return Response.json({ error: err.message }, { status: 500 });
+  }
+}

@@ -74,6 +74,7 @@ export function RiwayatTransaksiScreen({ vm }) {
               className="mb-4 w-full rounded-[10px] border border-input-border px-3.5 py-3 font-sans text-base font-bold" />
             <div className="flex gap-2.5">
               <button onClick={vm.closeCorrection} className="flex-1 cursor-pointer rounded-[10px] border border-input-border bg-white py-[11px] text-[13px] font-bold">Batal</button>
+              <button onClick={vm.deleteTransaction} className="flex-1 cursor-pointer rounded-[10px] border border-danger-border bg-danger-bg py-[11px] text-[13px] font-bold text-danger hover:bg-opacity-80">Hapus</button>
               <button onClick={vm.saveCorrection} className="flex-1 cursor-pointer rounded-[10px] border-none bg-brand py-[11px] text-[13px] font-bold text-white hover:bg-brand-dark">Simpan</button>
             </div>
           </div>

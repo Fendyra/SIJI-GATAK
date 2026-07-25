@@ -165,7 +165,7 @@ export default function useJimpitanViewModel() {
   const [rtList, setRtList] = useState([]);
   const [kelompokList, setKelompokList] = useState([]);
   const [petugasAccounts, setPetugasAccounts] = useState([]);
-  const [nominalDefaultSetting, setNominalDefaultSetting] = useState(2000);
+  const [nominalDefaultSetting, setNominalDefaultSetting] = useState(500);
   const [persentaseRt, setPersentaseRt] = useState(60);
   const [persentaseRonda, setPersentaseRonda] = useState(40);
   const [transactions, setTransactions] = useState([]);
@@ -178,7 +178,7 @@ export default function useJimpitanViewModel() {
   const [modalData, setModalData] = useState({});
 
   const [selectedHouseId, setSelectedHouseId] = useState(null);
-  const [nominalInput, setNominalInput] = useState(2000);
+  const [nominalInput, setNominalInput] = useState(500);
   const [search, setSearch] = useState("");
   const [scanState, setScanState] = useState("idle");
   const [scanQrInput, setScanQrInput] = useState("");
@@ -191,6 +191,13 @@ export default function useJimpitanViewModel() {
   const [adminRiwayatMode, setAdminRiwayatMode] = useState("semua");
   const [adminRiwayatDate, setAdminRiwayatDate] = useState(new Date().toLocaleDateString("en-CA"));
   const [adminRiwayatTransactions, setAdminRiwayatTransactions] = useState([]);
+  
+  const currentJsMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const currentJsYear = new Date().getFullYear().toString();
+  const [adminDashboardMonth, setAdminDashboardMonth] = useState(currentJsMonth);
+  const [adminDashboardYear, setAdminDashboardYear] = useState(currentJsYear);
+  const [adminDashboardPemasukan, setAdminDashboardPemasukan] = useState(0);
+
   const [correctionTxId, setCorrectionTxId] = useState(null);
   const [correctionNominal, setCorrectionNominal] = useState(0);
   const [rekapPeriode, setRekapPeriode] = useState("harian");
@@ -411,6 +418,49 @@ export default function useJimpitanViewModel() {
   useEffect(() => {
     if (screen === "admin-rekap") fetchRekap();
   }, [screen, fetchRekap]);
+
+  const fetchAdminDashboardPemasukan = useCallback(async () => {
+    try {
+      const res = await apiFetch(`/api/rekap?periode=bulanan&bulan=${adminDashboardYear}-${adminDashboardMonth}`);
+      setAdminDashboardPemasukan(res.data?.totalTerkumpul || 0);
+    } catch (err) {
+      setAdminDashboardPemasukan(0);
+    }
+  }, [adminDashboardMonth, adminDashboardYear]);
+
+  useEffect(() => {
+    if (screen === "admin-dashboard" && currentUser?.role === "admin") {
+      fetchAdminDashboardPemasukan();
+    }
+  }, [screen, currentUser, fetchAdminDashboardPemasukan]);
+
+  // Check existing session on mount
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await apiFetch("/api/auth/me");
+        if (res.user) {
+          setCurrentUser(res.user);
+          await fetchAllData(res.user);
+          
+          const searchParams = new URLSearchParams(window.location.search);
+          const redirectUrl = searchParams.get("redirect");
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+            return;
+          }
+          
+          setScreen(res.user.role === "admin" ? "admin-dashboard" : "dashboard");
+        }
+      } catch (err) {
+        // Not logged in, stay on login screen
+      }
+    }
+    // Only check if we are currently unauthenticated
+    if (!currentUser && screen === "login") {
+      checkSession();
+    }
+  }, []);
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -651,6 +701,35 @@ export default function useJimpitanViewModel() {
     finally { setIsLoading(false); }
   }
 
+  async function deleteTransaction() {
+    if (!correctionTxId) return;
+    setIsLoading(true);
+    try {
+      await apiFetch(`/api/transaksi?id=${correctionTxId}`, { method: "DELETE" });
+      setTransactions(transactions.filter(t => t.id !== correctionTxId));
+      
+      const houseId = transactions.find(t => t.id === correctionTxId)?.rumah_id;
+      if (houseId) {
+        setHouses(houses.map((h) => h.id === houseId ? { ...h, status: "belum", lastNominal: 0, lastTime: "" } : h));
+      }
+      
+      // Update rawHouses as well for riwayat
+      if (rawHouses.length > 0 && houseId) {
+        const tx = transactions.find(t => t.id === correctionTxId);
+        setRiwayatTransactions(riwayatTransactions.map((h) => 
+          h.id === houseId ? { ...h, status: "belum", lastNominal: 0, lastTime: "" } : h
+        ));
+      }
+      
+      closeCorrection();
+      showToast("Transaksi berhasil dihapus.");
+    } catch (err) {
+      showToast("Gagal menghapus: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function saveSetting() {
     if (persentaseRt + persentaseRonda !== 100) { showToast("Total persentase RT + Ronda harus 100%."); return; }
     setIsLoading(true);
@@ -811,7 +890,9 @@ export default function useJimpitanViewModel() {
     isAdminRumah: screen === "admin-rumah", isQr: screen === "admin-qr", isPetugasAkun: screen === "admin-petugas",
     isAdminRiwayat: screen === "admin-riwayat", isRekap: screen === "admin-rekap", isSetting: screen === "admin-setting",
     adminNavItems, mobileNavValue: screen, onMobileNavChange: (e) => goToAdmin(e.target.value),
-    totalRumahAdmin: total, totalKelompok: kelompokList.length, totalPemasukanDisplay: toRupiah(totalPemasukanBulanIni),
+    adminDashboardMonth, setAdminDashboardMonth,
+    adminDashboardYear, setAdminDashboardYear,
+    totalRumahAdmin: total, totalKelompok: kelompokList.length, totalPemasukanDisplay: toRupiah(adminDashboardPemasukan),
     trendBars: trendBarsData.length > 0 ? trendBarsData : [65, 80, 45, 90, 70, 55, 100].map((v, i) => ({ heightPct: v, label: ["Sen","Sel","Rab","Kam","Jum","Sab","Min"][i] })),
     rtProgress,
     rtRows, kelompokRows, rtList, kelompokList,
@@ -826,7 +907,7 @@ export default function useJimpitanViewModel() {
     qrHouses: houses, petugasRows,
     kelompokFilterOptions,
     isCorrectionOpen: !!correctionTxId, correctionHouseName: (transactions.find((t) => t.id === correctionTxId) || {}).nama || "",
-    correctionNominal, onCorrectionNominalChange: (e) => setCorrectionNominal(e.target.value), closeCorrection, saveCorrection,
+    correctionNominal, onCorrectionNominalChange: (e) => setCorrectionNominal(e.target.value), closeCorrection, saveCorrection, deleteTransaction, saveSetting,
     rekapPeriode, onRekapPeriodeChange: (e) => setRekapPeriode(e.target.value),
     rekapTotalDisplay: toRupiah(rekapTotal), rekapSudahCount, rekapBelumCount,
     rekapKasRtDisplay: toRupiah(rekapKasRt), rekapKasRondaDisplay: toRupiah(rekapKasRonda), rekapPersentase,

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function ScanClient({ rumah, kode, petugasId, kelompokId, petugas }) {
   const router = useRouter();
-  const [nominal, setNominal] = useState(rumah.nominal_default || 2000);
+  const [nominal, setNominal] = useState(rumah.nominal_default || 500);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
