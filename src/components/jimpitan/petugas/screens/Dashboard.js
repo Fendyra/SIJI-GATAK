@@ -2,15 +2,10 @@ import React, { useState, useEffect } from "react";
 import { toRupiah } from "@/lib/jimpitanData";
 
 export function Dashboard({ vm }) {
-  const [chartScale, setChartScale] = useState("hari"); // "hari", "minggu", "bulan", "tahun"
+  const [chartScale, setChartScale] = useState("minggu"); // "minggu", "bulan", "tahun"
   const [backendTrendBars, setBackendTrendBars] = useState(null);
 
   useEffect(() => {
-    if (chartScale === "hari") {
-      setBackendTrendBars(null);
-      return;
-    }
-    
     let isMounted = true;
     const fetchData = async () => {
       try {
@@ -75,12 +70,7 @@ export function Dashboard({ vm }) {
   const belumOffset = -selesaiDash;
   const kosongOffset = -(selesaiDash + belumDash);
 
-  let chartBars = [];
-  if (chartScale === "hari") {
-    chartBars = (vm.petugasTrendBars || []).map(b => ({ label: b.hour, total: b.total }));
-  } else {
-    chartBars = backendTrendBars || [];
-  }
+  const chartBars = backendTrendBars || [];
   
   // Calculate max scale with nice rounded steps (kelipatan yang jelas)
   const rawMax = Math.max(...chartBars.map(b => b.total), 1000);
@@ -214,7 +204,6 @@ export function Dashboard({ vm }) {
               onChange={(e) => setChartScale(e.target.value)}
               className="text-xs font-bold text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none focus:ring-1 focus:ring-brand"
             >
-              <option value="hari">Hari Ini</option>
               <option value="minggu">Minggu Ini</option>
               <option value="bulan">Bulan Ini</option>
               <option value="tahun">Tahun Ini</option>

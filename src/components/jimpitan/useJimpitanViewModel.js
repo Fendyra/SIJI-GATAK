@@ -839,19 +839,7 @@ export default function useJimpitanViewModel(hasSession = true) {
   const totalPemasukanBulanIni = transactions.filter((t) => t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
   const sudahCount = houses.filter((h) => h.status === "sudah").length;
 
-  // Trend bars for Petugas Line Chart (00:00 to 24:00, step 4 hours, or by hour)
-  const todayTransactions = transactions.filter(t => t.status === "sudah");
-  const petugasTrendBars = [0, 4, 8, 12, 16, 20, 24].map(hour => {
-    // Find sum of all transactions up to this hour today
-    const sum = todayTransactions.reduce((acc, t) => {
-      const txHour = new Date(t.created_at || new Date()).getHours();
-      return txHour <= hour ? acc + (t.nominal || 0) : acc;
-    }, 0);
-    return { hour: `${hour.toString().padStart(2, '0')}.00`, total: sum };
-  });
-  
-  // Calculate max for chart scaling
-  const maxPetugasTrend = Math.max(...petugasTrendBars.map(b => b.total), 1000);
+
 
   const rtProgress = rtList.map((rt) => {
     const rtHouses = houses.filter((h) => h.rt === rt.nama);
@@ -936,7 +924,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     petugasNavItems, currentUser,
     petugasName: currentUser?.nama || "", firstName: currentUser?.nama?.split(" ")[0] || "", adminName: currentUser?.nama || "", kelompok: currentUser?.kelompok || "", rt: currentUser?.rt || "", today,
     progressPct, progressDashOffset: 276.5 - (276.5 * progressPct) / 100, doneCount: doneHouses, totalHouses: total, totalTerkumpulDisplay: toRupiah(totalTerkumpul), kosongCount, pendingCount, sudahCount,
-    petugasTrendBars, maxPetugasTrend, totalTerkumpul, apiFetch,
+    totalTerkumpul, apiFetch,
     goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), openScan, simulateScan,
     scanQrInput, onScanQrChange: (e) => setScanQrInput(e.target.value), onQrScanned,
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,
