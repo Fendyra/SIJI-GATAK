@@ -1,26 +1,28 @@
 import React from "react";
 export function ListScreen({ vm }) {
   return (
-    <div className="max-w-[720px]">
-      <div className="font-display mb-0.5 text-xl font-extrabold">Pengambilan Jimpitan</div>
-      <div className="mb-[18px] text-[13px] text-muted">
-        {vm.kelompok} · {vm.rt}
+    <div className="max-w-[720px] w-full">
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <div className="font-display text-2xl font-extrabold text-gray-900 mb-1">Daftar Rumah</div>
+          <div className="text-[13px] text-muted-2">
+            {vm.kelompok} · {vm.rt}
+          </div>
+        </div>
       </div>
 
-      <button
-        onClick={vm.openScan}
-        className="mb-3.5 w-full cursor-pointer rounded-xl border-none bg-brand py-[15px] text-[15px] font-bold text-white transition-transform hover:bg-brand-dark active:scale-[0.98]"
-      >
-        Scan QR Rumah
-      </button>
-
-      <input
-        type="text"
-        value={vm.search}
-        onChange={vm.onSearchChange}
-        placeholder="Cari nama atau alamat rumah…"
-        className="mb-4 w-full rounded-[10px] border border-input-border px-3.5 py-3 font-sans text-sm"
-      />
+      <div className="relative mb-6">
+        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8578" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <input
+          type="text"
+          value={vm.search}
+          onChange={vm.onSearchChange}
+          placeholder="Cari nama atau alamat rumah…"
+          className="w-full rounded-[12px] border border-card-border pl-10 pr-4 py-3.5 font-sans text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors bg-white shadow-sm"
+        />
+      </div>
 
       <div className="flex flex-col gap-2.5">
         {vm.filteredHouses.map((h, index) => (
