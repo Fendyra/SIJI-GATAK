@@ -27,17 +27,17 @@ export default function LoginScreen({
       />
 
       <div className="animate-pop-in relative w-full max-w-[420px] rounded-3xl bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-10">
-        
+
         {/* Logo Section */}
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="-mt-6 flex flex-col items-center justify-center">
-            <img 
-              src="/logo.png" 
-              alt="Logo SIJI GATAK" 
-              className="h-44 w-auto object-contain"
+        <div className="mb-2 flex flex-col items-center text-center">
+          <div className="-mt-4 flex flex-col items-center justify-center">
+            <img
+              src="/logo.png"
+              alt="Logo SIJI GATAK"
+              className="h-48 w-auto object-contain scale-110"
             />
           </div>
-          <p className="-mt-6 text-sm font-medium text-gray-500">
+          <p className="-mt-10 text-sm font-medium text-gray-500 relative z-10">
             Sistem Informasi Jimpitan<br />Dusun Gatak
           </p>
         </div>
@@ -115,9 +115,8 @@ export default function LoginScreen({
           <div className="mb-6 flex items-center">
             <label className="flex cursor-pointer items-center gap-2">
               <div
-                className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
-                  rememberMe ? "border-brand bg-brand" : "border-gray-300 bg-white"
-                }`}
+                className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${rememberMe ? "border-brand bg-brand" : "border-gray-300 bg-white"
+                  }`}
                 onClick={() => setRememberMe(!rememberMe)}
               >
                 {rememberMe && (
