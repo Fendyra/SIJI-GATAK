@@ -21,6 +21,7 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get("limit") || "100", 10);
     const offset = parseInt(searchParams.get("offset") || "0", 10);
     const tanggal = searchParams.get("tanggal");
+    const kelompokId = searchParams.get("kelompok_id");
 
     let query = supabase
       .from("transaksi")
@@ -35,14 +36,17 @@ export async function GET(request) {
 
     if (sesiId) query = query.eq("sesi_id", sesiId);
     if (status) query = query.eq("status", status);
-    if (tanggal) {
-      // Filter berdasarkan tanggal via sesi_ronda
-      const { data: sesiData } = await supabase
-        .from("sesi_ronda")
-        .select("id")
-        .eq("tanggal", tanggal);
-      if (sesiData?.length) {
+    
+    if (tanggal || kelompokId) {
+      let sesiQuery = supabase.from("sesi_ronda").select("id");
+      if (tanggal) sesiQuery = sesiQuery.eq("tanggal", tanggal);
+      if (kelompokId) sesiQuery = sesiQuery.eq("kelompok_id", kelompokId);
+      
+      const { data: sesiData } = await sesiQuery;
+      if (sesiData && sesiData.length > 0) {
         query = query.in("sesi_id", sesiData.map((s) => s.id));
+      } else {
+        return Response.json({ data: [], total: 0 });
       }
     }
 

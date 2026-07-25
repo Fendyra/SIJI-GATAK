@@ -372,12 +372,12 @@ export default function useJimpitanViewModel(hasSession = true) {
         
         // Parallelize API fetches to reduce loading time
         const [rumahRes, sesiRes, txRes] = await Promise.all([
-          apiFetch(`/api/rumah`),
+          apiFetch(`/api/rumah?kelompok_id=${user.kelompok_id}`),
           apiFetch("/api/sesi", {
             method: "POST",
             body: JSON.stringify({ kelompok_id: user.kelompok_id, petugas_id: user.id, tanggal: tanggalLokal }),
           }),
-          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&limit=1000`)
+          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&kelompok_id=${user.kelompok_id}&limit=1000`)
         ]);
 
         const rawHousesData = (rumahRes.data || []).map(normalizeRumah);
