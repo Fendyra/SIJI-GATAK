@@ -140,17 +140,88 @@ export function RekapScreen({ vm }) {
       </div>
 
       <div className="rounded-2xl border border-card-border bg-white p-[22px]">
-        <div className="mb-3.5 text-sm font-bold text-label">Rekap per Kelompok</div>
+        <div className="mb-3.5 text-sm font-bold text-label">Rekap per Kelompok (Klik untuk Detail)</div>
         <div className="flex flex-col gap-3">
           {(vm.rekapPerKelompok || []).map((k) => (
-            <div key={k.nama} className="flex items-center justify-between">
-              <span className="text-[13px] font-bold">{k.nama}</span>
-              <span className="text-[13px] text-muted">{k.display}</span>
+            <div 
+              key={k.nama} 
+              onClick={() => vm.setSelectedRekapKelompok(k)}
+              className="flex items-center justify-between cursor-pointer rounded-lg px-3 py-2 -mx-3 transition-colors hover:bg-gray-50"
+            >
+              <div className="flex flex-col">
+                <span className="text-[13px] font-bold text-brand">{k.nama}</span>
+                <span className="text-[11px] text-muted-2">Tugas: {k.sesiList?.length || 0} kali</span>
+              </div>
+              <span className="text-[13px] font-bold text-ink">{k.display}</span>
             </div>
           ))}
           {(vm.rekapPerKelompok || []).length === 0 && <div className="text-[13px] text-muted-2">Belum ada data.</div>}
         </div>
       </div>
+
+      {vm.selectedRekapKelompok && (
+        <Modal onClose={() => vm.setSelectedRekapKelompok(null)}>
+          <ModalHeader title={`Detail Performa: ${vm.selectedRekapKelompok.nama}`} />
+          
+          {/* Bagian Buku Kas */}
+          <div className="mb-4">
+            <h3 className="mb-2 text-sm font-bold text-label">Buku Kas (Rincian per Sesi)</h3>
+            <div className="overflow-hidden rounded-xl border border-card-border">
+              <table className="w-full text-left text-[13px]">
+                <thead className="bg-[#f9f8f3] text-muted-2">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold">Tanggal</th>
+                    <th className="px-3 py-2 font-semibold text-right">Rumah</th>
+                    <th className="px-3 py-2 font-semibold text-right">Terkumpul</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f1efe7] bg-white">
+                  {(vm.selectedRekapKelompok.sesiList || []).map((s) => (
+                    <tr key={s.tanggal}>
+                      <td className="px-3 py-2 font-medium">{new Date(s.tanggal).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'})}</td>
+                      <td className="px-3 py-2 text-right">{s.count}</td>
+                      <td className="px-3 py-2 font-bold text-green-700 text-right">{toRupiah(s.total)}</td>
+                    </tr>
+                  ))}
+                  {(vm.selectedRekapKelompok.sesiList || []).length === 0 && (
+                    <tr><td colSpan="3" className="px-3 py-4 text-center text-muted-2">Tidak ada sesi.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Bagian Kehadiran Petugas */}
+          <div className="mb-2">
+            <h3 className="mb-2 text-sm font-bold text-label">Partisipasi Petugas (Kehadiran)</h3>
+            <div className="overflow-hidden rounded-xl border border-card-border">
+              <table className="w-full text-left text-[13px]">
+                <thead className="bg-[#f9f8f3] text-muted-2">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold">Nama Petugas</th>
+                    <th className="px-3 py-2 font-semibold text-right">Scan</th>
+                    <th className="px-3 py-2 font-semibold text-right">Hasil</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f1efe7] bg-white">
+                  {(vm.selectedRekapKelompok.petugasList || []).map((p) => (
+                    <tr key={p.nama}>
+                      <td className="px-3 py-2 font-medium">{p.nama}</td>
+                      <td className="px-3 py-2 text-right">{p.count}</td>
+                      <td className="px-3 py-2 font-bold text-green-700 text-right">{toRupiah(p.total)}</td>
+                    </tr>
+                  ))}
+                  {(vm.selectedRekapKelompok.petugasList || []).length === 0 && (
+                    <tr><td colSpan="3" className="px-3 py-4 text-center text-muted-2">Tidak ada data.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <ModalFooter onCancel={() => vm.setSelectedRekapKelompok(null)} hideSave={true} />
+        </Modal>
+      )}
     </div>
   );
 }

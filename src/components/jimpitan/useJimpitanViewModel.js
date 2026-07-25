@@ -202,6 +202,7 @@ export default function useJimpitanViewModel(hasSession = true) {
   const [correctionTxId, setCorrectionTxId] = useState(null);
   const [correctionNominal, setCorrectionNominal] = useState(0);
   const [rekapPeriode, setRekapPeriode] = useState("harian");
+  const [selectedRekapKelompok, setSelectedRekapKelompok] = useState(null);
   const [toast, setToast] = useState(null);
 
   const toastTimer = useRef(null);
@@ -913,6 +914,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     isCorrectionOpen: !!correctionTxId, correctionHouseName: (transactions.find((t) => t.id === correctionTxId) || {}).nama || "",
     correctionNominal, onCorrectionNominalChange: (e) => setCorrectionNominal(e.target.value), closeCorrection, saveCorrection, deleteTransaction, saveSetting,
     rekapPeriode, onRekapPeriodeChange: (e) => setRekapPeriode(e.target.value),
+    selectedRekapKelompok, setSelectedRekapKelompok,
     rekapTotalDisplay: toRupiah(rekapTotal), rekapSudahCount, rekapBelumCount,
     rekapKasRtDisplay: toRupiah(rekapKasRt), rekapKasRondaDisplay: toRupiah(rekapKasRonda), rekapPersentase,
     rekapPerRt: Array.isArray(rekapPerRt) ? rekapPerRt.map((r) => ({ ...r, display: toRupiah(r.total) })) : [],

@@ -41,6 +41,7 @@ export async function GET(request) {
       .select(`
         id, nominal, status, created_at,
         rumah:rumah_id(id, nama_penghuni, rt:rt_id(id, nama)),
+        petugas:petugas_id(id, nama),
         sesi:sesi_id(id, tanggal, kelompok:kelompok_id(id, nama))
       `)
       .gte("created_at", dateFrom)
@@ -88,11 +89,45 @@ export async function GET(request) {
     // Rekapitulasi per Kelompok
     const perKelompok = {};
     txSudah.forEach((t) => {
+      const kId = t.sesi?.kelompok?.id || "unknown";
       const kNama = t.sesi?.kelompok?.nama || "Tidak Diketahui";
-      if (!perKelompok[kNama]) perKelompok[kNama] = { nama: kNama, total: 0, count: 0 };
-      perKelompok[kNama].total += t.nominal;
-      perKelompok[kNama].count += 1;
+      
+      if (!perKelompok[kId]) {
+        perKelompok[kId] = {
+          id: kId,
+          nama: kNama,
+          total: 0,
+          count: 0,
+          sesi: {},
+          petugas: {},
+        };
+      }
+      perKelompok[kId].total += t.nominal;
+      perKelompok[kId].count += 1;
+
+      // Group by Sesi (Tanggal)
+      const tgl = t.sesi?.tanggal || "Tidak Diketahui";
+      if (!perKelompok[kId].sesi[tgl]) {
+        perKelompok[kId].sesi[tgl] = { tanggal: tgl, total: 0, count: 0 };
+      }
+      perKelompok[kId].sesi[tgl].total += t.nominal;
+      perKelompok[kId].sesi[tgl].count += 1;
+
+      // Group by Petugas
+      const pNama = t.petugas?.nama || "Admin / Tidak Diketahui";
+      if (!perKelompok[kId].petugas[pNama]) {
+        perKelompok[kId].petugas[pNama] = { nama: pNama, total: 0, count: 0 };
+      }
+      perKelompok[kId].petugas[pNama].total += t.nominal;
+      perKelompok[kId].petugas[pNama].count += 1;
     });
+
+    // Convert objects to array for easier consumption in React
+    const kelompokArray = Object.values(perKelompok).map(k => ({
+      ...k,
+      sesiList: Object.values(k.sesi).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)),
+      petugasList: Object.values(k.petugas).sort((a, b) => b.count - a.count), // sort by highest scan count
+    }));
 
     return Response.json({
       data: {
@@ -103,8 +138,8 @@ export async function GET(request) {
         persentase: { rt: pctRt, ronda: pctRonda },
         jumlahSudah: txSudah.length,
         jumlahKosong: transaksi?.filter((t) => t.status === "kosong").length || 0,
-        perRt: Object.values(perRt),
-        perKelompok: Object.values(perKelompok),
+        perRt: Object.values(perRt).sort((a, b) => b.total - a.total),
+        perKelompok: kelompokArray.sort((a, b) => b.total - a.total),
         transaksi: transaksi || [],
       },
     });
