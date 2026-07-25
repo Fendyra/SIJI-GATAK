@@ -29,15 +29,15 @@ export default function LoginScreen({
       <div className="animate-pop-in relative w-full max-w-[420px] rounded-3xl bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-10">
         
         {/* Logo Section */}
-        <div className="mb-10 flex flex-col items-center text-center">
-          <div className="mb-4 flex flex-col items-center justify-center">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="-mt-6 flex flex-col items-center justify-center">
             <img 
-              src="/logo-siji.png" 
+              src="/logo.png" 
               alt="Logo SIJI GATAK" 
-              className="h-24 w-auto object-contain"
+              className="h-44 w-auto object-contain"
             />
           </div>
-          <p className="mt-2 text-sm font-medium text-gray-500">
+          <p className="-mt-6 text-sm font-medium text-gray-500">
             Sistem Informasi Jimpitan<br />Dusun Gatak
           </p>
         </div>
