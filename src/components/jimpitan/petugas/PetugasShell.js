@@ -8,7 +8,7 @@ export default function PetugasShell({ vm }) {
       {vm.isDesktop ? (
         <div className="sticky top-0 flex h-screen w-[240px] flex-shrink-0 flex-col border-r border-card-border bg-white px-4 py-6">
           <div className="flex items-center gap-2.5 px-2 pb-5">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
+            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center">
               <img src="/logo.png" alt="Logo" className="h-full w-full object-contain scale-125" />
             </div>
             <div>

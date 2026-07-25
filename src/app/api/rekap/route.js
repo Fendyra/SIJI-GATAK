@@ -27,6 +27,19 @@ export async function GET(request) {
       const tanggal = searchParams.get("tanggal") || now.toISOString().split("T")[0];
       dateFrom = `${tanggal}T00:00:00`;
       dateTo = `${tanggal}T23:59:59`;
+    } else if (periode === "mingguan") {
+      const currentDay = now.getDay();
+      const distance = currentDay === 0 ? 6 : currentDay - 1; // Monday as first day
+      const firstDay = new Date(now);
+      firstDay.setDate(now.getDate() - distance);
+      const lastDay = new Date(firstDay);
+      lastDay.setDate(firstDay.getDate() + 6);
+      dateFrom = `${firstDay.toISOString().split("T")[0]}T00:00:00`;
+      dateTo = `${lastDay.toISOString().split("T")[0]}T23:59:59`;
+    } else if (periode === "tahunan") {
+      const year = searchParams.get("tahun") || now.getFullYear();
+      dateFrom = `${year}-01-01T00:00:00`;
+      dateTo = `${year}-12-31T23:59:59`;
     } else {
       // bulanan
       const bulan = searchParams.get("bulan") || now.toISOString().slice(0, 7);

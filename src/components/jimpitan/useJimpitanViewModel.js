@@ -933,10 +933,10 @@ export default function useJimpitanViewModel(hasSession = true) {
   const vm = {
     isMobile, isDesktop: !isMobile, isLoading, contentPadding: isMobile ? "16px 16px 96px 16px" : "32px 40px", logout,
     isDashboard: screen === "dashboard", isList: screen === "list", isScan: screen === "scan", isDetail: screen === "detail", isPetugasRiwayat: screen === "riwayat",
-    petugasNavItems,
+    petugasNavItems, currentUser,
     petugasName: currentUser?.nama || "", firstName: currentUser?.nama?.split(" ")[0] || "", adminName: currentUser?.nama || "", kelompok: currentUser?.kelompok || "", rt: currentUser?.rt || "", today,
     progressPct, progressDashOffset: 276.5 - (276.5 * progressPct) / 100, doneCount: doneHouses, totalHouses: total, totalTerkumpulDisplay: toRupiah(totalTerkumpul), kosongCount, pendingCount, sudahCount,
-    petugasTrendBars, maxPetugasTrend, totalTerkumpul,
+    petugasTrendBars, maxPetugasTrend, totalTerkumpul, apiFetch,
     goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), openScan, simulateScan,
     scanQrInput, onScanQrChange: (e) => setScanQrInput(e.target.value), onQrScanned,
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,
