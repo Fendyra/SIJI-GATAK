@@ -367,20 +367,24 @@ export default function useJimpitanViewModel(hasSession = true) {
         fetchTrend();
       } else {
         if (!user.kelompok_id) return;
-        const rumahRes = await apiFetch(`/api/rumah`);
+        const tanggalLokal = new Date().toLocaleDateString("en-CA");
+        
+        // Parallelize API fetches to reduce loading time
+        const [rumahRes, sesiRes, txRes] = await Promise.all([
+          apiFetch(`/api/rumah`),
+          apiFetch("/api/sesi", {
+            method: "POST",
+            body: JSON.stringify({ kelompok_id: user.kelompok_id, petugas_id: user.id, tanggal: tanggalLokal }),
+          }),
+          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&limit=1000`)
+        ]);
+
         const rawHousesData = (rumahRes.data || []).map(normalizeRumah);
         setRawHouses(rawHousesData);
-        const tanggalLokal = new Date().toLocaleDateString("en-CA");
-        const sesiRes = await apiFetch("/api/sesi", {
-          method: "POST",
-          body: JSON.stringify({ kelompok_id: user.kelompok_id, petugas_id: user.id, tanggal: tanggalLokal }),
-        });
+        
         const sesiId = sesiRes.data?.id;
         setActiveSesiId(sesiId);
         
-        // Fetch ALL transactions for today, not just this session, 
-        // to enable global progress tracking for all Petugas
-        const txRes = await apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&limit=1000`);
         const txList = txRes.data || [];
         setTransactions(txList.map(normalizeTx));
           const txMap = {};
