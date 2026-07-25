@@ -31,19 +31,13 @@ export default function LoginScreen({
         {/* Logo Section */}
         <div className="mb-10 flex flex-col items-center text-center">
           <div className="mb-4 flex flex-col items-center justify-center">
-            {/* Custom SVG Logo based on the screenshot (House + Piggy/Coin) */}
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32 4L4 26V60H60V26L32 4Z" stroke="#1f7a4d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M26 16H38V26H26V16Z" fill="#1f7a4d"/>
-              <circle cx="32" cy="38" r="12" fill="#fbbf24"/>
-              <text x="32" y="42" fontSize="12" fill="#fff" fontWeight="bold" textAnchor="middle">Rp</text>
-              <path d="M16 46C16 46 22 56 32 56C42 56 48 46 48 46" stroke="#1f7a4d" strokeWidth="4" strokeLinecap="round"/>
-            </svg>
+            <img 
+              src="/logo.png" 
+              alt="Logo SIJI GATAK" 
+              className="h-24 w-auto object-contain"
+            />
           </div>
-          <h1 className="font-display text-2xl font-black tracking-tight text-gray-900">
-            <span className="text-brand">SIJI</span> GATAK
-          </h1>
-          <p className="mt-1 text-sm font-medium text-gray-500">
+          <p className="mt-2 text-sm font-medium text-gray-500">
             Sistem Informasi Jimpitan<br />Dusun Gatak
           </p>
         </div>
@@ -173,14 +167,10 @@ export default function LoginScreen({
       {/* Footer */}
       <div className="absolute bottom-6 left-0 right-0 text-center">
         <div className="mb-1 flex items-center justify-center gap-1.5 text-xs font-medium text-gray-500">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <polyline points="9 12 11 14 15 10"></polyline>
-          </svg>
-          Sistem aman dan terpercaya
+          Sistem Informasi Jimpitan Online Dusun Gatak
         </div>
         <div className="text-[11px] text-gray-400">
-          &copy; 2026 Jimpitan Online &ndash; Dusun Gatak
+          &copy; 2026 SIJI GATAK &ndash; KKN UPNYK 84.036
         </div>
       </div>
     </div>
