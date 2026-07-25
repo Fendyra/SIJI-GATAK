@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.7",
+    "dotenv": "^17.4.2",
     "html5-qrcode": "^2.3.8",
     "jszip": "^3.10.1",
     "lightningcss": "^1.33.0",

@@ -15,7 +15,6 @@ export async function GET(request) {
       return Response.json({ user: null }, { status: 401 });
     }
 
-    // Get petugas detail
     const { data: petugas, error: petugasError } = await supabase
       .from("petugas")
       .select(`
@@ -25,8 +24,10 @@ export async function GET(request) {
         role,
         kelompok_id,
         kelompok:kelompok_id (
-          id,
-          nama
+          nama,
+          rt (
+            nama
+          )
         )
       `)
       .eq("id", user.id)
@@ -43,7 +44,8 @@ export async function GET(request) {
       username: petugas.username,
       role: petugas.role,
       kelompok_id: petugas.kelompok_id,
-      kelompok: petugas.kelompok,
+      kelompok: petugas.kelompok?.nama || "",
+      rt: petugas.kelompok?.rt?.nama || "",
     };
 
     return Response.json({ user: currentUser });
