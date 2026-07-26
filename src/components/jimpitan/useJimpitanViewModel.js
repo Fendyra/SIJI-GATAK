@@ -827,12 +827,9 @@ export default function useJimpitanViewModel(hasSession = true) {
       txId = t.id;
       nominal = t.nominal;
     } else {
-      // 1. Try to find today's transaction in riwayatDetailHistory
-      const today = new Date().toDateString();
-      let tx = riwayatDetailHistory.find(tx => 
-        (tx.houseId === t.id || tx.rumah_id === t.id) && 
-        (tx.created_at ? new Date(tx.created_at).toDateString() === today : true)
-      );
+      // 1. If we are in RiwayatDetailScreen, just take the first transaction in history!
+      let tx = riwayatDetailHistory.length > 0 ? riwayatDetailHistory[0] : null;
+      
       // 2. Fallback to global transactions array (used in admin view)
       if (!tx) tx = transactions.find((tx) => (tx.houseId === t.id || tx.rumah_id === t.id));
       
@@ -846,6 +843,7 @@ export default function useJimpitanViewModel(hasSession = true) {
       setCorrectionTxId(txId);
       setCorrectionNominal(nominal);
     } else {
+      alert("Data transaksi belum tersedia untuk dikoreksi.");
       showToast("Data transaksi tidak ditemukan.");
     }
   }
