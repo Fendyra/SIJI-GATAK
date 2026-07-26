@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { toRupiah } from "@/lib/jimpitanData";
+import { createClient } from "@/lib/supabase/client";
 
 const ADMIN_NAV_DEFS = [
   { key: "admin-dashboard", label: "Dashboard" },
@@ -346,8 +347,8 @@ export default function useJimpitanViewModel(hasSession = true) {
     }
   }, [currentUser]);
 
-  const fetchAllData = useCallback(async (user) => {
-    setIsLoading(true);
+  const fetchAllData = useCallback(async (user, silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const [rtRes, kelompokRes, settingRes] = await Promise.all([
         apiFetch("/api/rt"),
@@ -411,7 +412,7 @@ export default function useJimpitanViewModel(hasSession = true) {
       console.error("fetchAllData error:", err);
       showToast("Gagal memuat data: " + err.message);
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   }, [fetchTrend]);
 
@@ -445,6 +446,30 @@ export default function useJimpitanViewModel(hasSession = true) {
       fetchAdminDashboardPemasukan();
     }
   }, [screen, currentUser, fetchAdminDashboardPemasukan]);
+
+  // Supabase Realtime Sync for Petugas
+  useEffect(() => {
+    if (!currentUser || currentUser.role === "admin") return;
+    
+    const supabase = createClient();
+    const channel = supabase
+      .channel('realtime:transaksi')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transaksi' },
+        (payload) => {
+          // Hanya refresh jika transaksi terkait dengan kelompok yang sama
+          // (Karena payload hanya berisi kolom transaksi, kita bisa refresh diam-diam)
+          console.log("Realtime event received:", payload);
+          fetchAllData(currentUser, true);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser, fetchAllData]);
 
   // Check existing session on mount
   useEffect(() => {
