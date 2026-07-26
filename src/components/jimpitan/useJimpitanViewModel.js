@@ -207,6 +207,8 @@ export default function useJimpitanViewModel(hasSession = true) {
   const [selectedRekapKelompok, setSelectedRekapKelompok] = useState(null);
   const [toast, setToast] = useState(null);
 
+  const [riwayatDetailHouse, setRiwayatDetailHouse] = useState(null);
+  const [riwayatDetailHistory, setRiwayatDetailHistory] = useState([]);
   const toastTimer = useRef(null);
   const scanTimer = useRef(null);
 
@@ -771,6 +773,21 @@ export default function useJimpitanViewModel(hasSession = true) {
     } catch (err) { showToast("Gagal menyimpan transaksi: " + err.message); }
     finally { setIsLoading(false); }
   }
+  async function fetchRiwayatDetailHistory(houseId) {
+    try {
+      const res = await apiFetch(`/api/transaksi?rumah_id=${houseId}&limit=14`);
+      setRiwayatDetailHistory(res.data ? res.data.map(normalizeTx) : []);
+    } catch (err) {
+      showToast("Gagal memuat histori pembayaran: " + err.message);
+    }
+  }
+
+  function openRiwayatDetail(t) {
+    setRiwayatDetailHouse(t);
+    setRiwayatDetailHistory([]);
+    setScreen("riwayat-detail");
+    fetchRiwayatDetailHistory(t.id || t.houseId);
+  }
 
   function openCorrection(t) {
     let txId = null;
@@ -1004,12 +1021,12 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   const vm = {
     isMobile, isDesktop: !isMobile, isLoading, contentPadding: isMobile ? "16px 16px 96px 16px" : "32px 40px", logout,
-    isDashboard: screen === "dashboard", isList: screen === "list", isScan: screen === "scan", isDetail: screen === "detail", isPetugasRiwayat: screen === "riwayat", isSuccess: screen === "success",
+    isDashboard: screen === "dashboard", isList: screen === "list", isScan: screen === "scan", isDetail: screen === "detail", isPetugasRiwayat: screen === "riwayat", isSuccess: screen === "success", isRiwayatDetail: screen === "riwayat-detail",
     petugasNavItems, currentUser,
     petugasName: currentUser?.nama || "", firstName: currentUser?.nama?.split(" ")[0] || "", adminName: currentUser?.nama || "", kelompok: currentUser?.kelompok || "", rt: currentUser?.rt || "", today,
     progressPct, progressDashOffset: 276.5 - (276.5 * progressPct) / 100, doneCount: doneHouses, totalHouses: total, totalTerkumpulDisplay: toRupiah(totalTerkumpul), kosongCount, pendingCount, sudahCount,
     totalTerkumpul, apiFetch,
-    goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), goToDashboard: () => goTo("dashboard"), openScan, simulateScan,
+    goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), goToDashboard: () => goTo("dashboard"), openScan, simulateScan, openRiwayatDetail, riwayatDetailHouse, riwayatDetailHistory,
     scanQrInput, onScanQrChange: (e) => setScanQrInput(e.target.value), onQrScanned,
     lastSavedTx,
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,

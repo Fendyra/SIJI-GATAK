@@ -60,7 +60,7 @@ export function RiwayatScreen({ vm }) {
           return (
             <div
               key={t.id}
-              onClick={() => t.id && vm.openCorrection(t)}
+              onClick={() => vm.openRiwayatDetail(t)}
               className="animate-fade-in-up group flex items-center gap-4 rounded-[20px] bg-white p-4 cursor-pointer transition-all duration-200 hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.1)] active:scale-[0.98] border border-transparent hover:border-gray-100 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.04)]"
               style={{ animationDelay: `${index * 15}ms` }}
             >
