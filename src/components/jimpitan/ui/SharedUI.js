@@ -221,39 +221,60 @@ export function TransactionInvoiceModal({ vm }) {
           </div>
           <div className="flex flex-col gap-2.5">
             <div className="flex justify-between items-start">
-              <span className="text-[13px] text-muted-2 font-medium w-32">Nama</span>
-              <span className="text-[13px] font-bold text-gray-900 text-right">{h.nama || "-"}</span>
+              <span className="text-[13px] text-muted-2 font-medium w-36">Nama Kepala Keluarga</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{h.nama || tx.nama_penghuni || "-"}</span>
             </div>
             <div className="flex justify-between items-start">
-              <span className="text-[13px] text-muted-2 font-medium w-32">Kelompok</span>
-              <span className="text-[13px] font-bold text-gray-900 text-right">{h.kelompok || vm.kelompok || "-"}</span>
+              <span className="text-[13px] text-muted-2 font-medium w-36">Alamat</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{h.alamat || tx.alamat || "-"}</span>
+            </div>
+            <div className="flex justify-between items-start">
+              <span className="text-[13px] text-muted-2 font-medium w-36">Kelompok</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{h.kelompok || tx.kelompok || vm.kelompok || "-"}</span>
+            </div>
+            <div className="flex justify-between items-start">
+              <span className="text-[13px] text-muted-2 font-medium w-36">RT / RW</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{tx.rt_rw || (vm.rt ? `RT ${vm.rt}` : "-")}</span>
             </div>
           </div>
         </div>
 
         {/* Info Transaksi */}
-        <div className="bg-white rounded-2xl p-4 mb-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-4 mb-3 border border-gray-100 shadow-sm">
           <div className="text-[12px] font-extrabold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
              Informasi Transaksi
           </div>
           <div className="flex flex-col gap-2.5">
             <div className="flex justify-between items-center">
-              <span className="text-[13px] text-muted-2 font-medium w-32">Nominal</span>
+              <span className="text-[13px] text-muted-2 font-medium w-36">Nominal Jimpitan</span>
               <span className="text-[16px] font-black text-brand text-right">{nominalDisplay}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[13px] text-muted-2 font-medium w-32">Metode Input</span>
-              <span className="text-[13px] font-bold text-gray-900 text-right">Manual / Petugas</span>
+              <span className="text-[13px] text-muted-2 font-medium w-36">Metode Input</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{tx.metode || "Manual / Petugas"}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[13px] text-muted-2 font-medium w-32">Petugas</span>
-              <span className="text-[13px] font-bold text-gray-900 text-right">{tx.petugasName || vm.petugasName || "-"}</span>
+              <span className="text-[13px] text-muted-2 font-medium w-36">Petugas</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{tx.petugasName || tx.petugas || vm.petugasName || "-"}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[13px] text-muted-2 font-medium w-32">Status</span>
+              <span className="text-[13px] text-muted-2 font-medium w-36">Waktu Transaksi</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{tx.waktu || `${dateStr} . ${timeStr}`}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-muted-2 font-medium w-36">Status</span>
               <span className="text-[11px] font-bold text-brand bg-brand-light px-2 py-0.5 rounded-md">Berhasil</span>
             </div>
+          </div>
+        </div>
+
+        {/* Riwayat Perubahan */}
+        <div className="bg-white border border-card-border rounded-2xl p-4 mb-6 shadow-sm">
+          <div className="text-[12px] font-extrabold text-gray-900 uppercase tracking-wide mb-3">Riwayat Perubahan</div>
+          <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col items-center justify-center gap-1">
+            <span className="text-[13px] font-bold text-gray-400">-</span>
+            <span className="text-[11px] font-medium text-gray-400">Tidak ada perubahan data</span>
           </div>
         </div>
 
