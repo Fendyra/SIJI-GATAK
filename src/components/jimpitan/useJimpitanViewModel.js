@@ -1046,7 +1046,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     petugasName: currentUser?.nama || "", firstName: currentUser?.nama?.split(" ")[0] || "", adminName: currentUser?.nama || "", kelompok: currentUser?.kelompok || "", rt: currentUser?.rt || "", today,
     progressPct, progressDashOffset: 276.5 - (276.5 * progressPct) / 100, doneCount: doneHouses, totalHouses: total, totalTerkumpulDisplay: toRupiah(totalTerkumpul), kosongCount, pendingCount, sudahCount,
     totalTerkumpul, apiFetch,
-    goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), goToDashboard: () => goTo("dashboard"), openScan, simulateScan, openRiwayatDetail, riwayatDetailHouse, riwayatDetailHistory,
+    goToList: () => goTo("scan"), goToRiwayat: () => goTo("riwayat"), goToDashboard: () => goTo("dashboard"), openScan, simulateScan, openRiwayatDetail, riwayatDetailHouse, riwayatDetailHistory,
     scanQrInput, onScanQrChange: (e) => setScanQrInput(e.target.value), onQrScanned,
     lastSavedTx,
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,
