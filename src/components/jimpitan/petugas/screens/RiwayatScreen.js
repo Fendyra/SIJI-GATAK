@@ -124,14 +124,14 @@ export function RiwayatScreen({ vm }) {
       </div>
 
       {/* Floating Total Summary */}
-      <div className="sticky bottom-4 mt-8 z-20">
-        <div className="bg-gray-900 rounded-[20px] p-4 sm:p-5 flex items-center justify-between shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)]">
-          <div className="flex flex-col">
+      <div className="fixed bottom-6 left-0 right-0 z-10 px-4 md:left-[240px] md:px-10 pointer-events-none">
+        <div className="mx-auto flex max-w-[720px] items-center justify-between rounded-2xl bg-gray-900 px-6 py-4 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] pointer-events-auto border border-gray-800">
+          <div>
             <span className="text-white/60 text-[12px] font-bold uppercase tracking-wider mb-0.5">Total Terkumpul</span>
-            <span className="text-white text-[13px] font-medium">Hari ini, {formattedDate}</span>
+            <div className="text-white text-[13px] font-semibold">{formattedDate}</div>
           </div>
-          <div className="text-white text-[22px] font-black tracking-tight">
-            {vm.totalTerkumpulDisplay}
+          <div className="text-[22px] font-black tracking-tight text-white">
+            {vm.riwayatTotalTerkumpulDisplay}
           </div>
         </div>
       </div>

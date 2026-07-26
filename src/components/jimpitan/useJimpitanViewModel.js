@@ -228,12 +228,8 @@ export default function useJimpitanViewModel(hasSession = true) {
     async function fetchRiwayatData() {
       if (!currentUser?.kelompok_id || rawHouses.length === 0) return;
       try {
-        const sesiRes = await apiFetch(`/api/sesi?kelompok_id=${currentUser.kelompok_id}&tanggal=${riwayatDate}`);
-        let txList = [];
-        if (sesiRes.data?.id) {
-          const txRes = await apiFetch(`/api/transaksi?sesi_id=${sesiRes.data.id}`);
-          txList = txRes.data || [];
-        }
+        const txRes = await apiFetch(`/api/transaksi?kelompok_id=${currentUser.kelompok_id}&tanggal=${riwayatDate}&limit=500`);
+        const txList = txRes.data || [];
         
         const txMap = {};
         txList.forEach((t) => { txMap[t.rumah_id || t.rumah?.id] = t; });
@@ -1046,6 +1042,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     petugasName: currentUser?.nama || "", firstName: currentUser?.nama?.split(" ")[0] || "", adminName: currentUser?.nama || "", kelompok: currentUser?.kelompok || "", rt: currentUser?.rt || "", today,
     progressPct, progressDashOffset: 276.5 - (276.5 * progressPct) / 100, doneCount: doneHouses, totalHouses: total, totalTerkumpulDisplay: toRupiah(totalTerkumpul), kosongCount, pendingCount, sudahCount,
     totalTerkumpul, apiFetch,
+    riwayatTotalTerkumpulDisplay: toRupiah(riwayatTransactions.filter((h) => h.status === "sudah").reduce((sum, h) => sum + (h.lastNominal || 0), 0)),
     goToList: () => goTo("scan"), goToRiwayat: () => goTo("riwayat"), goToDashboard: () => goTo("dashboard"), openScan, simulateScan, openRiwayatDetail, riwayatDetailHouse, riwayatDetailHistory,
     scanQrInput, onScanQrChange: (e) => setScanQrInput(e.target.value), onQrScanned,
     lastSavedTx,
