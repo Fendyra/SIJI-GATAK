@@ -63,6 +63,7 @@ export async function POST(request) {
         nama: profil.nama,
         username: profil.username,
         role: profil.role,
+        kelompok_id: profil.kelompok_id,
         kelompok: profil.kelompok?.nama || null,
         rt: profil.kelompok?.rt?.nama || null,
       },
