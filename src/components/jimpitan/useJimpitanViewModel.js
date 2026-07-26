@@ -372,12 +372,12 @@ export default function useJimpitanViewModel(hasSession = true) {
         
         // Parallelize API fetches to reduce loading time
         const [rumahRes, sesiRes, txRes] = await Promise.all([
-          apiFetch(`/api/rumah?kelompok_id=${user.kelompok_id}`),
+          apiFetch(`/api/rumah`),
           apiFetch("/api/sesi", {
             method: "POST",
             body: JSON.stringify({ kelompok_id: user.kelompok_id, petugas_id: user.id, tanggal: tanggalLokal }),
           }),
-          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&kelompok_id=${user.kelompok_id}&limit=1000`)
+          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&limit=1000`)
         ]);
 
         const rawHousesData = (rumahRes.data || []).map(normalizeRumah);
@@ -400,6 +400,7 @@ export default function useJimpitanViewModel(hasSession = true) {
               lastTime: new Date(tx.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
             };
           }));
+          fetchTrend();
       }
     } catch (err) {
       console.error("fetchAllData error:", err);
@@ -794,6 +795,24 @@ export default function useJimpitanViewModel(hasSession = true) {
   const pendingCount = houses.filter((h) => h.status === "belum").length;
   const progressPct = total > 0 ? Math.round((doneHouses / total) * 100) : 0;
   const totalTerkumpul = transactions.filter((t) => t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
+
+  useEffect(() => {
+    if (trendBarsData.length > 0) {
+      setTrendBarsData(prev => {
+        const newBars = [...prev];
+        const lastBarIndex = newBars.length - 1;
+        if (newBars[lastBarIndex].total !== totalTerkumpul) {
+          newBars[lastBarIndex].total = totalTerkumpul;
+          const maxTotal = Math.max(...newBars.map(b => b.total), 1);
+          return newBars.map(b => ({
+            ...b,
+            heightPct: Math.max(Math.round((b.total / maxTotal) * 100), 4)
+          }));
+        }
+        return prev;
+      });
+    }
+  }, [totalTerkumpul]);
 
   const petugasActiveKey = screen === "detail" ? "scan" : screen; // maps detail screen to scan menu
   const petugasNavItems = [
