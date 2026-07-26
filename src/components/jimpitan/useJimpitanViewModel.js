@@ -795,36 +795,12 @@ export default function useJimpitanViewModel(hasSession = true) {
   const progressPct = total > 0 ? Math.round((doneHouses / total) * 100) : 0;
   const totalTerkumpul = transactions.filter((t) => t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
 
-  const petugasActiveKey = screen;
+  const petugasActiveKey = screen === "detail" ? "scan" : screen; // maps detail screen to scan menu
   const petugasNavItems = [
     { key: "dashboard", label: "Dashboard" },
-    { 
-      key: "pengambilan", 
-      label: "Pengambilan", 
-      isAccordion: true,
-      subItems: [
-        { key: "scan", label: "Scan QR Rumah" },
-        { key: "list", label: "Daftar Rumah" },
-        { key: "riwayat", label: "Riwayat Transaksi" },
-      ]
-    }
+    { key: "scan", label: "Pengambilan" },
+    { key: "riwayat", label: "Riwayat Transaksi" },
   ].map((item) => {
-    if (item.isAccordion) {
-      const parentActive = item.subItems.some(sub => screen === sub.key) || screen === "detail";
-      const subItems = item.subItems.map(sub => {
-        // "detail" active state maps to "list" to keep it highlighted when opening a house detail from the list
-        const subActive = screen === sub.key || (sub.key === "list" && screen === "detail");
-        return {
-          ...sub,
-          active: subActive,
-          bg: subActive ? "#eaf3ec" : "transparent",
-          color: subActive ? "#1f7a4d" : "#4a544d",
-          accentShadow: subActive ? "inset 3px 0 0 #1f7a4d" : "none",
-          onClick: () => goTo(sub.key)
-        };
-      });
-      return { ...item, active: parentActive, subItems };
-    }
     const active = petugasActiveKey === item.key;
     return { ...item, active, bg: active ? "#eaf3ec" : "transparent", color: active ? "#1f7a4d" : "#4a544d", mobileColor: active ? "#1f7a4d" : "#8a8578", accentShadow: active ? "inset 3px 0 0 #1f7a4d" : "none", onClick: () => goTo(item.key) };
   });
