@@ -71,7 +71,7 @@ export function QRScanner({ onScan }) {
     const file = e.target.files?.[0];
     if (!file || !scannerRef.current) return;
     try {
-      const decodedText = await scannerRef.current.scanFile(file, true);
+      const decodedText = await scannerRef.current.scanFile(file, false);
       onScan(decodedText);
     } catch (err) {
       alert("Tidak dapat menemukan QR Code pada gambar tersebut.");
