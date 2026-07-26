@@ -979,7 +979,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     displayValue: t.status === "sudah" ? toRupiah(t.nominal || t.lastNominal) : t.status === "kosong" ? "Kosong" : "Belum", 
     statusBg: t.status === "sudah" ? "#e8f3ec" : t.status === "kosong" ? "#fbeee0" : "#f1efe7", 
     statusColor: t.status === "sudah" ? "#1f7a4d" : t.status === "kosong" ? "#b5691f" : "#8a8578",
-    onClick: () => openRiwayatDetail(t)
+    onClick: () => adminRiwayatMode === "harian" ? openRiwayatDetail(t) : openCorrection(t)
   }));
 
   const rekapTotal = rekapData?.totalTerkumpul ?? totalTerkumpul;
