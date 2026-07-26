@@ -64,12 +64,12 @@ export function ScanScreen({ vm }) {
         </div>
       </div>
 
-      {!vm.search && !isScannerOpen && (
+      {!vm.search && !isScannerOpen && vm.filteredHouses.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12">
           <SvgHouse />
           <div className="mt-6 text-[15px] font-extrabold text-gray-900">Belum ada rumah yang ditampilkan</div>
           <div className="mt-2 text-[13px] text-muted-2 text-center max-w-[300px]">
-            Scan QR atau cari nama/alamat rumah untuk melihat data pengambilan.
+            Data rumah untuk kelompok ini belum tersedia.
           </div>
         </div>
       )}
@@ -80,7 +80,7 @@ export function ScanScreen({ vm }) {
         </div>
       )}
 
-      {vm.search && (
+      {(vm.filteredHouses.length > 0 || vm.search) && (
         <div className="flex flex-col gap-2.5">
           {vm.filteredHouses.map((h, index) => (
             <div
