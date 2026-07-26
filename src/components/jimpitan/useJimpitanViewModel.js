@@ -776,7 +776,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     let txId = null;
     let nominal = 0;
     
-    if (t.rumah_id || t.petugas) {
+    if (t.houseId !== undefined || t.rumah_id !== undefined) {
       txId = t.id;
       nominal = t.nominal;
     } else {
