@@ -76,6 +76,7 @@ export function PetugasAkunScreen({ vm }) {
                         <div className="rounded-full px-2.5 py-1 text-[11px] font-bold" style={{ background: p.statusBg, color: p.statusColor }}>{p.statusLabel}</div>
                         <button onClick={p.onEdit} className="cursor-pointer rounded-lg border border-input-border bg-white px-3 py-[7px] text-xs font-bold transition-colors hover:border-brand hover:text-brand">Ubah</button>
                         <button onClick={p.onToggle} className="cursor-pointer rounded-lg border border-input-border bg-white px-3 py-[7px] text-xs font-bold transition-colors hover:border-danger hover:text-danger">{p.toggleLabel}</button>
+                        <button onClick={() => vm.openPetugasDetail(p)} className="cursor-pointer rounded-lg border border-transparent bg-brand text-white px-3 py-[7px] text-xs font-bold transition-colors hover:bg-brand-dark shadow-sm">Detail Kinerja</button>
                       </div>
                     </div>
                   ))}

@@ -209,6 +209,10 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   const [riwayatDetailHouse, setRiwayatDetailHouse] = useState(null);
   const [riwayatDetailHistory, setRiwayatDetailHistory] = useState([]);
+  
+  const [petugasDetailAccount, setPetugasDetailAccount] = useState(null);
+  const [petugasDetailHistory, setPetugasDetailHistory] = useState([]);
+
   const toastTimer = useRef(null);
   const scanTimer = useRef(null);
 
@@ -786,7 +790,23 @@ export default function useJimpitanViewModel(hasSession = true) {
     setRiwayatDetailHouse(t);
     setRiwayatDetailHistory([]);
     setScreen("riwayat-detail");
-    fetchRiwayatDetailHistory(t.id || t.houseId);
+    fetchRiwayatDetailHistory(t.houseId || t.id);
+  }
+
+  async function fetchPetugasDetailHistory(petugasId) {
+    try {
+      const res = await apiFetch(`/api/transaksi?petugas_id=${petugasId}&limit=50`);
+      setPetugasDetailHistory(res.data ? res.data.map(normalizeTx) : []);
+    } catch (err) {
+      showToast("Gagal memuat histori petugas: " + err.message);
+    }
+  }
+
+  function openPetugasDetail(petugas) {
+    setPetugasDetailAccount(petugas);
+    setPetugasDetailHistory([]);
+    setScreen("admin-petugas-detail");
+    fetchPetugasDetailHistory(petugas.id);
   }
 
   function openCorrection(t) {
@@ -981,7 +1001,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     displayValue: t.status === "sudah" ? toRupiah(t.nominal || t.lastNominal) : t.status === "kosong" ? "Kosong" : "Belum", 
     statusBg: t.status === "sudah" ? "#e8f3ec" : t.status === "kosong" ? "#fbeee0" : "#f1efe7", 
     statusColor: t.status === "sudah" ? "#1f7a4d" : t.status === "kosong" ? "#b5691f" : "#8a8578",
-    onClick: () => { if (t.status === "sudah" || t.status === "kosong") openCorrection(t); }
+    onClick: () => openRiwayatDetail(t)
   }));
 
   const rekapTotal = rekapData?.totalTerkumpul ?? totalTerkumpul;
@@ -1038,6 +1058,9 @@ export default function useJimpitanViewModel(hasSession = true) {
     isAdminDashboard: screen === "admin-dashboard", isRt: screen === "admin-rt", isKelompok: screen === "admin-kelompok",
     isAdminRumah: screen === "admin-rumah", isQr: screen === "admin-qr", isPetugasAkun: screen === "admin-petugas",
     isAdminRiwayat: screen === "admin-riwayat", isRekap: screen === "admin-rekap", isSetting: screen === "admin-setting",
+    isAdminPetugasDetail: screen === "admin-petugas-detail", isAdminShell: screen.startsWith("admin-"),
+    goToAdminRiwayat: () => goTo("admin-riwayat"), goToAdminPetugas: () => goTo("admin-petugas"),
+    openPetugasDetail, petugasDetailAccount, petugasDetailHistory,
     adminNavItems, mobileNavValue: screen, onMobileNavChange: (e) => goToAdmin(e.target.value),
     adminDashboardMonth, setAdminDashboardMonth,
     adminDashboardYear, setAdminDashboardYear,

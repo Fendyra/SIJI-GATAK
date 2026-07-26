@@ -6,4 +6,5 @@ export { QrScreen } from './QrScreen';
 export { PetugasAkunScreen } from './PetugasAkunScreen';
 export { RiwayatTransaksiScreen } from './RiwayatTransaksiScreen';
 export { RekapScreen } from './RekapScreen';
-export { SettingScreen } from './SettingScreen';
+export { SettingScreen } from "./SettingScreen";
+export { AdminPetugasDetailScreen } from "./AdminPetugasDetailScreen";

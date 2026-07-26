@@ -23,6 +23,7 @@ export async function GET(request) {
     const tanggal = searchParams.get("tanggal");
     const kelompokId = searchParams.get("kelompok_id");
     const rumahId = searchParams.get("rumah_id");
+    const petugasId = searchParams.get("petugas_id");
 
     let query = supabase
       .from("transaksi")
@@ -38,6 +39,7 @@ export async function GET(request) {
     if (sesiId) query = query.eq("sesi_id", sesiId);
     if (status) query = query.eq("status", status);
     if (rumahId) query = query.eq("rumah_id", rumahId);
+    if (petugasId) query = query.eq("petugas_id", petugasId);
     
     if (tanggal || kelompokId) {
       let sesiQuery = supabase.from("sesi_ronda").select("id");

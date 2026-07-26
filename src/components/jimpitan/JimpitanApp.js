@@ -110,6 +110,7 @@ function ProfileModal({ currentUser, onClose, onSave }) {
 }
 
 const PETUGAS_SCREENS = ["dashboard", "list", "scan", "detail", "riwayat", "success", "riwayat-detail"];
+const ADMIN_SCREENS = ["admin-dashboard", "admin-rt", "admin-kelompok", "admin-rumah", "admin-qr", "admin-petugas", "admin-riwayat", "admin-rekap", "admin-setting", "admin-petugas-detail"];
 
 export default function JimpitanApp({ hasSession = true }) {
   const {

@@ -10,7 +10,9 @@ import {
   RiwayatTransaksiScreen,
   RekapScreen,
   SettingScreen,
+  AdminPetugasDetailScreen,
 } from "./screens";
+import { RiwayatDetailScreen } from "../petugas/screens/RiwayatDetailScreen";
 
 export default function AdminShell({ vm }) {
   return (
@@ -96,8 +98,10 @@ export default function AdminShell({ vm }) {
         {vm.isQr ? <QrScreen vm={vm} /> : null}
         {vm.isPetugasAkun ? <PetugasAkunScreen vm={vm} /> : null}
         {vm.isAdminRiwayat ? <RiwayatTransaksiScreen vm={vm} /> : null}
+        {vm.isRiwayatDetail ? <RiwayatDetailScreen vm={vm} /> : null}
         {vm.isRekap ? <RekapScreen vm={vm} /> : null}
         {vm.isSetting ? <SettingScreen vm={vm} /> : null}
+        {vm.isAdminPetugasDetail ? <AdminPetugasDetailScreen vm={vm} /> : null}
       </div>
     </div>
   );
