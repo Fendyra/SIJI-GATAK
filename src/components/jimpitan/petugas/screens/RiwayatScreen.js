@@ -128,7 +128,7 @@ export function RiwayatScreen({ vm }) {
       </div>
 
       {/* Floating Total Summary */}
-      <div className="fixed bottom-6 left-0 right-0 z-10 px-4 md:left-[240px] md:px-10 pointer-events-none">
+      <div className="fixed bottom-[80px] md:bottom-8 left-0 right-0 z-10 px-4 md:left-[240px] md:px-10 pointer-events-none">
         <div className="mx-auto flex max-w-[720px] items-center justify-between rounded-2xl bg-gray-900 px-6 py-4 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.5)] pointer-events-auto border border-gray-800">
           <div>
             <span className="text-white/60 text-[12px] font-bold uppercase tracking-wider mb-0.5">Total Terkumpul</span>
