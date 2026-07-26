@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
+import jsQR from "jsqr";
 
 const IconFlashlight = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H9.5L8 10h8l-1.5-8z"/><path d="M8 10v4h8v-4"/><path d="M12 14v8"/></svg>
@@ -67,16 +68,46 @@ export function QRScanner({ onScan }) {
     }
   };
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
-    if (!file || !scannerRef.current) return;
-    try {
-      const decodedText = await scannerRef.current.scanFile(file, false);
-      onScan(decodedText);
-    } catch (err) {
-      alert("Tidak dapat menemukan QR Code pada gambar tersebut.");
-    }
-    e.target.value = ''; // reset
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        
+        // Resize large images for better performance
+        const MAX_WIDTH = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(img, 0, 0, width, height);
+        
+        const imageData = context.getImageData(0, 0, width, height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        
+        if (code && code.data) {
+          onScan(code.data);
+        } else {
+          // If the image is inverted, we could try again with "attemptBoth" but it's slower.
+          alert("Tidak dapat menemukan QR Code pada gambar tersebut.");
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   return (
