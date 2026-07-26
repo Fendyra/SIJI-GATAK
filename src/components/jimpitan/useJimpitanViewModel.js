@@ -174,6 +174,7 @@ export default function useJimpitanViewModel(hasSession = true) {
   const [rekapData, setRekapData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [trendBarsData, setTrendBarsData] = useState([]);
+  const [lastSavedTx, setLastSavedTx] = useState(null);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
@@ -758,8 +759,15 @@ export default function useJimpitanViewModel(hasSession = true) {
         setRiwayatTransactions((prev) => prev.map((h) => h.id === house.id ? { ...h, status, lastNominal: nominal, lastTime: time } : h));
       }
       setTransactions((prev) => [newTx, ...prev]);
-      setScreen("list");
-      showToast(status === "sudah" ? "Transaksi tersimpan." : "Rumah ditandai kosong.");
+      
+      setLastSavedTx({
+        nama_penghuni: house.nama_penghuni,
+        alamat: house.alamat,
+        nominal: nominal,
+        status: status,
+      });
+      setScreen("success");
+      
     } catch (err) { showToast("Gagal menyimpan transaksi: " + err.message); }
     finally { setIsLoading(false); }
   }
@@ -996,13 +1004,14 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   const vm = {
     isMobile, isDesktop: !isMobile, isLoading, contentPadding: isMobile ? "16px 16px 96px 16px" : "32px 40px", logout,
-    isDashboard: screen === "dashboard", isList: screen === "list", isScan: screen === "scan", isDetail: screen === "detail", isPetugasRiwayat: screen === "riwayat",
+    isDashboard: screen === "dashboard", isList: screen === "list", isScan: screen === "scan", isDetail: screen === "detail", isPetugasRiwayat: screen === "riwayat", isSuccess: screen === "success",
     petugasNavItems, currentUser,
     petugasName: currentUser?.nama || "", firstName: currentUser?.nama?.split(" ")[0] || "", adminName: currentUser?.nama || "", kelompok: currentUser?.kelompok || "", rt: currentUser?.rt || "", today,
     progressPct, progressDashOffset: 276.5 - (276.5 * progressPct) / 100, doneCount: doneHouses, totalHouses: total, totalTerkumpulDisplay: toRupiah(totalTerkumpul), kosongCount, pendingCount, sudahCount,
     totalTerkumpul, apiFetch,
-    goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), openScan, simulateScan,
+    goToList: () => goTo("list"), goToRiwayat: () => goTo("riwayat"), goToDashboard: () => goTo("dashboard"), openScan, simulateScan,
     scanQrInput, onScanQrChange: (e) => setScanQrInput(e.target.value), onQrScanned,
+    lastSavedTx,
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,
     isScanning: scanState === "scanning", isScanIdle: scanState === "idle", isScanEmpty: scanState === "empty", isScanNotFound: scanState === "not_found",
     scanButtonLabel: scanState === "scanning" ? "Memindai…" : "Simulasikan Scan Berhasil",
