@@ -139,7 +139,7 @@ export default function SuccessScreen({ vm }) {
           onClick={vm.goToDashboard}
           className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl border border-brand bg-white py-3.5 text-[14px] font-bold text-brand transition-colors hover:bg-brand/5 active:scale-[0.98]"
         >
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
           <path d="M0 0h24v24H0z" fill="none" />
           <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19L21 7l-1.4-1.4z" />
         </svg>
@@ -149,8 +149,9 @@ export default function SuccessScreen({ vm }) {
           onClick={handleShare}
           className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl border-none bg-brand py-3.5 text-[14px] font-bold text-white transition-transform hover:bg-brand-dark active:scale-[0.98]"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h12l2 2v8z" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+            <path d="M0 0h24v24H0z" fill="none" />
+            <path fill="currentColor" fill-rule="evenodd" d="M7.25 18h12.5c.69 0 1.25-.56 1.25-1.25V4.25C21 3.56 20.44 3 19.75 3H7.25C6.56 3 6 3.56 6 4.25v12.5c0 .69.56 1.25 1.25 1.25m12.25-1.5h-12v-12h12zM5.75 21H18v-1.5H5.75c-.69 0-1.25-.56-1.25-1.25V6H3v12.25A2.755 2.755 0 0 0 5.75 21" clip-rule="evenodd" />
           </svg>
           Salin Bukti
         </button>
