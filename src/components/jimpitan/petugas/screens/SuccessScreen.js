@@ -1,5 +1,6 @@
 import React from "react";
 import { toRupiah } from "@/lib/jimpitanData";
+import { Stepper } from "../../ui/SharedUI";
 
 export default function SuccessScreen({ vm }) {
   const tx = vm.lastSavedTx;
@@ -16,7 +17,9 @@ export default function SuccessScreen({ vm }) {
 
   return (
     <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center p-6 text-center">
-      <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-brand-light">
+      <Stepper currentStep={3} />
+      
+      <div className="mt-8 mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-brand-light">
         {isKosong ? (
           <svg className="h-12 w-12 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>

@@ -3,67 +3,161 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 
-export function QRScanner({ onScan, onClose }) {
+const IconFlashlight = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H9.5L8 10h8l-1.5-8z"/><path d="M8 10v4h8v-4"/><path d="M12 14v8"/></svg>
+);
+
+const IconImage = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+);
+
+const IconSparkle = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+);
+
+export function QRScanner({ onScan }) {
   const [error, setError] = useState(null);
   const scannerRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [torchSupported, setTorchSupported] = useState(false);
+  const [torchOn, setTorchOn] = useState(false);
 
   useEffect(() => {
-    // We use a unique ID for the QR reader div
     const html5QrCode = new Html5Qrcode("qr-reader");
     scannerRef.current = html5QrCode;
 
     const qrCodeSuccessCallback = (decodedText) => {
-      // Pause scanner immediately upon success to prevent double scanning
-      if (html5QrCode.isScanning) {
-        html5QrCode.pause();
-      }
+      if (html5QrCode.isScanning) html5QrCode.pause();
       onScan(decodedText);
-    };
-
-    const qrCodeErrorCallback = () => {
-      // Ignore background errors
     };
 
     html5QrCode.start(
       { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
-      },
+      { fps: 10, aspectRatio: 1.0 }, // No internal qrbox since we use custom overlay
       qrCodeSuccessCallback,
-      qrCodeErrorCallback
-    ).catch((err) => {
+      () => {} // Ignore continuous scanning errors
+    ).then(() => {
+      // Check if torch is supported
+      if (html5QrCode.getRunningTrackCameraCapabilities()?.torchFeature()?.isSupported()) {
+        setTorchSupported(true);
+      }
+    }).catch((err) => {
       console.error("Camera start error:", err);
-      setError("Gagal mengakses kamera. Pastikan browser memiliki izin akses kamera.");
+      setError("Gagal mengakses kamera. Pastikan izin kamera diberikan.");
     });
 
     return () => {
       if (html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-          html5QrCode.clear();
-        }).catch(console.error);
+        html5QrCode.stop().then(() => html5QrCode.clear()).catch(console.error);
       }
     };
   }, [onScan]);
 
+  const toggleTorch = () => {
+    if (!scannerRef.current || !torchSupported) {
+      alert("Fitur senter tidak didukung pada perangkat/browser ini.");
+      return;
+    }
+    const html5QrCode = scannerRef.current;
+    if (html5QrCode.isScanning) {
+      html5QrCode.applyVideoConstraints({
+        advanced: [{ torch: !torchOn }]
+      }).then(() => setTorchOn(!torchOn))
+        .catch(() => alert("Gagal mengaktifkan senter."));
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !scannerRef.current) return;
+    try {
+      const decodedText = await scannerRef.current.scanFile(file, true);
+      onScan(decodedText);
+    } catch (err) {
+      alert("Tidak dapat menemukan QR Code pada gambar tersebut.");
+    }
+    e.target.value = ''; // reset
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center py-6 w-full max-w-[400px] mx-auto">
+    <div className="w-full">
       {error ? (
-        <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium w-full text-center">
+        <div className="bg-red-50 text-red-600 p-4 rounded-[16px] text-[13px] font-bold w-full text-center">
           {error}
         </div>
       ) : (
-        <div className="w-full relative rounded-2xl overflow-hidden border-2 border-brand bg-black">
-          <div id="qr-reader" className="w-full h-full" style={{ minHeight: "300px" }}></div>
+        <div className="relative w-full aspect-[4/5] rounded-[16px] overflow-hidden bg-black flex items-center justify-center">
+          
+          {/* Camera feed */}
+          <div id="qr-reader" className="absolute inset-0 object-cover w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full" />
+          
+          {/* Dark Overlay with cutout effect */}
+          <div className="absolute inset-0 z-10 pointer-events-none" style={{
+            background: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5))',
+            maskImage: 'radial-gradient(circle, transparent 20%, black 21%)',
+            WebkitMaskImage: 'radial-gradient(circle, transparent 20%, black 21%)'
+          }} />
+
+          {/* Fallback dark overlay if mask isn't supported - we just use a border frame instead */}
+          <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
+             <div className="w-[65%] aspect-square relative">
+                {/* Corner Brackets */}
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl" />
+                <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl" />
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl" />
+
+                {/* Animated Scanning Line */}
+                <div className="absolute w-full h-[2px] bg-brand top-1/2 shadow-[0_0_8px_2px_rgba(31,122,77,0.5)] animate-scan-line" />
+             </div>
+          </div>
+
+          {/* Bottom Controls */}
+          <div className="absolute bottom-5 left-0 right-0 z-20 px-5 flex items-center justify-between">
+            <button 
+              onClick={toggleTorch}
+              className={`w-[46px] h-[46px] rounded-full flex items-center justify-center transition-colors cursor-pointer ${torchOn ? 'bg-brand text-white' : 'bg-white text-gray-900'}`}
+            >
+              <IconFlashlight />
+            </button>
+            
+            <div className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-ink/70 backdrop-blur-sm text-white text-[11px] font-bold">
+              <IconSparkle />
+              <span>Pastikan QR code berada di dalam kotak</span>
+            </div>
+            
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="w-[46px] h-[46px] rounded-full bg-white flex items-center justify-center text-gray-900 transition-colors cursor-pointer hover:bg-gray-100"
+            >
+              <IconImage />
+            </button>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              accept="image/*" 
+              onChange={handleFileUpload} 
+              className="hidden" 
+            />
+          </div>
+
+          <style jsx>{`
+            @keyframes scanLine {
+              0% { top: 10%; opacity: 0; }
+              10% { opacity: 1; }
+              90% { opacity: 1; }
+              100% { top: 90%; opacity: 0; }
+            }
+            .animate-scan-line {
+              animation: scanLine 2.5s infinite linear;
+            }
+            /* Hide the default html5-qrcode elements */
+            #qr-reader__dashboard_section_csr { display: none !important; }
+            #qr-reader__dashboard_section_swaplink { display: none !important; }
+            #qr-reader__status_span { display: none !important; }
+          `}</style>
         </div>
       )}
-      <button 
-        onClick={onClose}
-        className="mt-6 px-6 py-2.5 rounded-full bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-colors"
-      >
-        Batalkan Pemindaian
-      </button>
     </div>
   );
 }

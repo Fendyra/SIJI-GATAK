@@ -1,10 +1,21 @@
 import React from "react";
+import { Stepper } from "../../ui/SharedUI";
+
 export function DetailScreen({ vm }) {
   const h = vm.selectedHouse;
   return (
-    <div className="max-w-[480px]">
-      <button onClick={vm.goToList} className="mb-4 cursor-pointer border-none bg-transparent p-0 text-[13px] font-bold text-muted">
-        ‹ Kembali
+    <div className="max-w-[480px] w-full mx-auto">
+      <div className="mb-6">
+        <div className="font-display text-[22px] font-extrabold text-gray-900 mb-1">Pengambilan Jimpitan</div>
+        <div className="text-[13px] font-medium text-muted-2">
+          {vm.kelompok} · {vm.rt}
+        </div>
+      </div>
+
+      <Stepper currentStep={2} />
+
+      <button onClick={vm.goToList} className="mb-4 cursor-pointer border-none bg-transparent p-0 text-[13px] font-bold text-muted transition-colors hover:text-brand">
+        ‹ Kembali ke Pindai QR
       </button>
 
       <div className="mb-4 rounded-2xl border border-card-border bg-white p-[22px]">

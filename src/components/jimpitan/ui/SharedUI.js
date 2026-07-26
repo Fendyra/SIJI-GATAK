@@ -94,3 +94,41 @@ export function downloadQr(canvasId, filename) {
 }
 
 // ─── AdminDashboard ──────────────────────────────────────────────────────────
+
+// ─── Stepper ─────────────────────────────────────────────────────────────────
+export function Stepper({ currentStep }) {
+  const steps = [
+    { num: 1, title: "Scan QR", subtitle: "Pindai QR rumah" },
+    { num: 2, title: "Konfirmasi", subtitle: "Cek detail data" },
+    { num: 3, title: "Selesai", subtitle: "Simpan transaksi" },
+  ];
+
+  return (
+    <div className="mb-6 flex items-center justify-between rounded-[16px] border border-card-border bg-white p-3 md:p-5 shadow-sm overflow-x-auto whitespace-nowrap">
+      {steps.map((step, index) => {
+        const isActive = step.num === currentStep;
+        const isPast = step.num < currentStep;
+        return (
+          <React.Fragment key={step.num}>
+            <div className="flex items-center gap-3">
+              <div 
+                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[13px] font-bold transition-colors ${isActive ? 'bg-brand text-white' : isPast ? 'bg-brand/20 text-brand' : 'bg-gray-100 text-gray-400'}`}
+              >
+                {step.num}
+              </div>
+              <div className="flex flex-col">
+                <span className={`text-[13px] font-extrabold ${isActive || isPast ? 'text-gray-900' : 'text-gray-400'}`}>
+                  {step.title}
+                </span>
+                <span className="text-[11px] text-muted-2 hidden sm:block">{step.subtitle}</span>
+              </div>
+            </div>
+            {index < steps.length - 1 && (
+              <div className="mx-2 md:mx-4 flex-1 h-[2px] w-4 md:w-8 bg-gray-100 rounded-full" />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
