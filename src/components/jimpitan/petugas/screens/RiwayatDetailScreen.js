@@ -111,8 +111,11 @@ export function RiwayatDetailScreen({ vm }) {
                         </div>
                       </div>
                       
-                      {/* Status Badge */}
-                      <div className="flex items-center">
+                      {/* Status Badge & Action */}
+                      <div className="flex items-center gap-3">
+                        <div className="text-[11px] font-bold text-brand bg-brand-light/50 px-2.5 py-1 rounded-md">
+                          Lihat Detail
+                        </div>
                         {isDone ? (
                           <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand">
                             <IconCheck />
