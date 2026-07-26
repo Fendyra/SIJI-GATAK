@@ -847,6 +847,23 @@ export default function useJimpitanViewModel(hasSession = true) {
       showToast("Data transaksi tidak ditemukan.");
     }
   }
+  
+  const [invoiceTx, setInvoiceTx] = useState(null);
+  function openInvoice(tx) {
+    if (!tx) return;
+    if (tx.status === 'sudah') {
+      setInvoiceTx(tx);
+    } else {
+      openCorrection(tx);
+    }
+  }
+  function closeInvoice() { setInvoiceTx(null); }
+  function openCorrectionFromInvoice() {
+    if (invoiceTx) {
+      openCorrection(invoiceTx);
+      closeInvoice();
+    }
+  }
   function closeCorrection() { setCorrectionTxId(null); }
 
   async function saveCorrection() {
@@ -1092,7 +1109,8 @@ export default function useJimpitanViewModel(hasSession = true) {
     qrHouses: houses, petugasRows,
     kelompokFilterOptions,
     isCorrectionOpen: !!correctionTxId, correctionHouseName: (transactions.find((t) => t.id === correctionTxId) || {}).nama || "",
-    correctionNominal, onCorrectionNominalChange: (e) => setCorrectionNominal(e.target.value), closeCorrection, saveCorrection, deleteTransaction, saveSetting,
+    correctionNominal, onCorrectionNominalChange: (e) => setCorrectionNominal(e.target.value), openCorrection, closeCorrection, saveCorrection, deleteTransaction, saveSetting,
+    invoiceTx, openInvoice, closeInvoice, openCorrectionFromInvoice,
     rekapPeriode, onRekapPeriodeChange: (e) => setRekapPeriode(e.target.value),
     selectedRekapKelompok, setSelectedRekapKelompok,
     rekapTotalDisplay: toRupiah(rekapTotal), rekapSudahCount, rekapBelumCount,

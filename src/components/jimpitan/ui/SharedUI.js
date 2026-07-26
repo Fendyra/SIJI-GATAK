@@ -172,3 +172,102 @@ export function CorrectionModal({ vm }) {
     </div>
   );
 }
+
+export function TransactionInvoiceModal({ vm }) {
+  if (!vm.invoiceTx) return null;
+  
+  const tx = vm.invoiceTx;
+  const isDone = tx.status === 'sudah';
+  if (!isDone) return null;
+  
+  let date;
+  if (tx.time && tx.time.includes(":")) {
+    date = new Date();
+    const [h, m] = tx.time.split(":");
+    date.setHours(h, m, 0, 0);
+  } else {
+    date = new Date(tx.created_at || Date.now());
+  }
+
+  const dateStr = date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+  const timeStr = tx.time || date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+  const nominalDisplay = `Rp${(tx.nominal || 0).toLocaleString("id-ID")}`;
+  
+  // Use riwayatDetailHouse if we have it, else fallback
+  const h = vm.riwayatDetailHouse || {};
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-md p-5 animate-fade-in" onClick={vm.closeInvoice}>
+      <div className="w-full max-w-[400px] rounded-[24px] bg-[#faf9f6] p-6 shadow-2xl animate-fade-in-up flex flex-col max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        
+        {/* Header Success */}
+        <div className="flex flex-col items-center justify-center mb-6">
+          <div className="w-14 h-14 rounded-full bg-brand/10 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1f7a4d" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div className="text-[20px] font-black text-gray-900">Transaksi Berhasil</div>
+          <div className="text-[13px] font-semibold text-muted-2 mt-1">{dateStr} · {timeStr}</div>
+          <div className="mt-2 text-[11px] font-bold text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded-md">
+            #{tx.id ? tx.id.substring(0, 8).toUpperCase() : "INV-0001"}
+          </div>
+        </div>
+
+        {/* Info Rumah */}
+        <div className="bg-white rounded-2xl p-4 mb-3 border border-gray-100 shadow-sm">
+          <div className="text-[12px] font-extrabold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+             Informasi Rumah
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <div className="flex justify-between items-start">
+              <span className="text-[13px] text-muted-2 font-medium w-32">Nama</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{h.nama || "-"}</span>
+            </div>
+            <div className="flex justify-between items-start">
+              <span className="text-[13px] text-muted-2 font-medium w-32">Kelompok</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{h.kelompok || vm.kelompok || "-"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Transaksi */}
+        <div className="bg-white rounded-2xl p-4 mb-6 border border-gray-100 shadow-sm">
+          <div className="text-[12px] font-extrabold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+             Informasi Transaksi
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-muted-2 font-medium w-32">Nominal</span>
+              <span className="text-[16px] font-black text-brand text-right">{nominalDisplay}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-muted-2 font-medium w-32">Metode Input</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">Manual / Petugas</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-muted-2 font-medium w-32">Petugas</span>
+              <span className="text-[13px] font-bold text-gray-900 text-right">{tx.petugasName || vm.petugasName || "-"}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-muted-2 font-medium w-32">Status</span>
+              <span className="text-[11px] font-bold text-brand bg-brand-light px-2 py-0.5 rounded-md">Berhasil</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col gap-2.5 mt-auto">
+          <button onClick={vm.closeInvoice} className="w-full cursor-pointer rounded-xl bg-gray-900 py-3.5 text-[14px] font-extrabold text-white hover:bg-gray-800 transition-colors">
+            Tutup
+          </button>
+          <button onClick={vm.openCorrectionFromInvoice} className="w-full cursor-pointer flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-3.5 text-[14px] font-extrabold text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Koreksi Transaksi Ini
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
