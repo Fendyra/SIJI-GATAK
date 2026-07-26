@@ -113,9 +113,12 @@ export function RiwayatDetailScreen({ vm }) {
                       
                       {/* Status Badge & Action */}
                       <div className="flex items-center gap-3">
-                        <div className="text-[11px] font-bold text-brand bg-brand-light/50 px-2.5 py-1 rounded-md">
-                          Lihat Detail
-                        </div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); vm.openInvoice(tx); }}
+                          className="cursor-pointer text-[12px] font-bold text-brand border border-brand bg-white hover:bg-brand hover:text-white px-3 py-1.5 rounded-full transition-colors shadow-sm"
+                        >
+                          Lihat Invoice
+                        </button>
                         {isDone ? (
                           <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand">
                             <IconCheck />
