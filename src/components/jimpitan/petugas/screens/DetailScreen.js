@@ -1,5 +1,5 @@
 import React from "react";
-import { Stepper } from "../../ui/SharedUI";
+import { Stepper, CorrectionModal, TransactionInvoiceModal } from "../../ui/SharedUI";
 
 export function DetailScreen({ vm }) {
   const h = vm.selectedHouse;
@@ -85,6 +85,9 @@ export function DetailScreen({ vm }) {
           </button>
         </div>
       ) : null}
+      
+      <CorrectionModal vm={vm} />
+      <TransactionInvoiceModal vm={vm} />
     </div>
   );
 }
