@@ -1,4 +1,5 @@
 import React from "react";
+import { CorrectionModal } from "../../ui/SharedUI";
 
 const IconCalendar = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>;
 const IconClock = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
@@ -140,41 +141,7 @@ export function RiwayatScreen({ vm }) {
       </div>
 
       {/* Modern Correction Modal */}
-      {vm.isCorrectionOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-5 animate-fade-in" onClick={vm.closeCorrection}>
-          <div className="w-full max-w-[360px] rounded-[24px] bg-white p-6 shadow-2xl animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-2 text-xl font-black text-gray-900 tracking-tight">Koreksi Data</div>
-            <div className="mb-6 text-[13.5px] text-muted-2 leading-relaxed">
-              Sesuaikan nominal atau batalkan transaksi untuk <span className="font-bold text-gray-900">{vm.correctionHouseName}</span>.
-            </div>
-            
-            <label className="mb-2 block text-[13px] font-extrabold text-gray-700 uppercase tracking-wide">Nominal Baru (Rp)</label>
-            <div className="relative mb-8">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rp</span>
-              <input 
-                type="number" 
-                value={vm.correctionNominal} 
-                onChange={vm.onCorrectionNominalChange}
-                className="w-full rounded-[14px] bg-gray-50 border-2 border-transparent px-10 py-3.5 font-sans text-[17px] font-black text-gray-900 outline-none focus:border-brand focus:bg-white transition-colors" 
-              />
-            </div>
-            
-            <div className="flex flex-col gap-3">
-              <button onClick={vm.saveCorrection} className="w-full cursor-pointer rounded-[14px] border-none bg-brand py-3.5 text-[15px] font-extrabold text-white hover:bg-brand-dark transition-colors shadow-[0_4px_12px_-4px_rgba(31,122,77,0.4)]">
-                Simpan Perubahan
-              </button>
-              <div className="flex gap-3">
-                <button onClick={vm.closeCorrection} className="flex-1 cursor-pointer rounded-[14px] bg-gray-100 py-3.5 text-[14px] font-bold text-gray-600 hover:bg-gray-200 transition-colors">
-                  Tutup
-                </button>
-                <button onClick={vm.deleteTransaction} className="flex-1 cursor-pointer rounded-[14px] bg-[#fef2f2] py-3.5 text-[14px] font-bold text-red-600 hover:bg-red-100 transition-colors">
-                  Hapus Data
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CorrectionModal vm={vm} />
     </div>
   );
 }
