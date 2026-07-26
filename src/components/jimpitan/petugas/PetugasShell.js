@@ -132,17 +132,28 @@ export default function PetugasShell({ vm }) {
       </div>
 
       {vm.isMobile ? (
-        <div className="fixed right-0 bottom-0 left-0 z-10 flex border-t border-card-border bg-white px-1.5 py-2">
-          {vm.petugasNavItems.map((item) => (
-            <button
-              key={item.key}
-              onClick={item.onClick}
-              className="flex-1 cursor-pointer border-none bg-transparent py-2 text-xs font-bold"
-              style={{ color: item.mobileColor }}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="fixed right-0 bottom-0 left-0 z-10 flex border-t border-card-border bg-white px-1.5 py-2 justify-around">
+          {vm.petugasNavItems.reduce((acc, item) => {
+            if (item.isAccordion) {
+              return acc.concat(item.subItems);
+            }
+            return acc.concat(item);
+          }, []).map((item) => {
+            const Icon = item.key === "dashboard" ? IconHome : item.key === "scan" ? IconQr : item.key === "list" ? IconList : IconHistory;
+            const color = item.active ? "#1f7a4d" : "#8a8578";
+            
+            return (
+              <button
+                key={item.key}
+                onClick={item.onClick}
+                className="flex-1 cursor-pointer flex flex-col items-center justify-center border-none bg-transparent py-1.5 text-[10.5px] font-bold gap-1.5 transition-colors"
+                style={{ color }}
+              >
+                <Icon />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
       ) : null}
     </div>
