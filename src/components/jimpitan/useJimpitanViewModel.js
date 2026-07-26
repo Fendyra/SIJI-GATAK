@@ -827,7 +827,15 @@ export default function useJimpitanViewModel(hasSession = true) {
       txId = t.id;
       nominal = t.nominal;
     } else {
-      const tx = transactions.find((tx) => tx.houseId === t.id);
+      // 1. Try to find today's transaction in riwayatDetailHistory
+      const today = new Date().toDateString();
+      let tx = riwayatDetailHistory.find(tx => 
+        (tx.houseId === t.id || tx.rumah_id === t.id) && 
+        (tx.created_at ? new Date(tx.created_at).toDateString() === today : true)
+      );
+      // 2. Fallback to global transactions array (used in admin view)
+      if (!tx) tx = transactions.find((tx) => (tx.houseId === t.id || tx.rumah_id === t.id));
+      
       if (tx) {
         txId = tx.id;
         nominal = tx.nominal;
@@ -851,7 +859,10 @@ export default function useJimpitanViewModel(hasSession = true) {
         method: "PATCH",
         body: JSON.stringify({ id: correctionTxId, nominal: Number(correctionNominal) || 0, status: "sudah" }),
       });
-      setTransactions((prev) => prev.map((t) => t.id === correctionTxId ? { ...t, nominal: res.data.nominal, status: res.data.status } : t));
+      const updateFn = (prev) => prev.map((t) => t.id === correctionTxId ? { ...t, nominal: res.data.nominal, status: res.data.status } : t);
+      setTransactions(updateFn);
+      setRiwayatDetailHistory(updateFn);
+      setPetugasDetailHistory(updateFn);
       setCorrectionTxId(null);
       showToast("Transaksi berhasil dikoreksi.");
     } catch (err) { showToast("Gagal koreksi: " + err.message); }
@@ -863,9 +874,16 @@ export default function useJimpitanViewModel(hasSession = true) {
     setIsLoading(true);
     try {
       await apiFetch(`/api/transaksi?id=${correctionTxId}`, { method: "DELETE" });
-      setTransactions((prev) => prev.filter(t => t.id !== correctionTxId));
       
-      const houseId = transactions.find(t => t.id === correctionTxId)?.rumah_id;
+      let houseId = transactions.find(t => t.id === correctionTxId)?.rumah_id;
+      if (!houseId) houseId = riwayatDetailHistory.find(t => t.id === correctionTxId)?.rumah_id;
+      if (!houseId) houseId = petugasDetailHistory.find(t => t.id === correctionTxId)?.rumah_id;
+      
+      const filterFn = (prev) => prev.filter(t => t.id !== correctionTxId);
+      setTransactions(filterFn);
+      setRiwayatDetailHistory(filterFn);
+      setPetugasDetailHistory(filterFn);
+      
       if (houseId) {
         setHouses((prev) => prev.map((h) => h.id === houseId ? { ...h, status: "belum", lastNominal: 0, lastTime: "" } : h));
       }
