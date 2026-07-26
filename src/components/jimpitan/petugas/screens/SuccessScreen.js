@@ -139,15 +139,20 @@ export default function SuccessScreen({ vm }) {
           onClick={vm.goToDashboard}
           className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl border border-brand bg-white py-3.5 text-[14px] font-bold text-brand transition-colors hover:bg-brand/5 active:scale-[0.98]"
         >
-          <IconEdit />
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+          <path d="M0 0h24v24H0z" fill="none" />
+          <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19L21 7l-1.4-1.4z" />
+        </svg>
           Selesai
         </button>
         <button
           onClick={handleShare}
           className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl border-none bg-brand py-3.5 text-[14px] font-bold text-white transition-transform hover:bg-brand-dark active:scale-[0.98]"
         >
-          <IconShare />
-          Bagikan Bukti
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h12l2 2v8z" />
+          </svg>
+          Salin Bukti
         </button>
       </div>
     </div>
