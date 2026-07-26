@@ -734,7 +734,28 @@ export default function useJimpitanViewModel(hasSession = true) {
     finally { setIsLoading(false); }
   }
 
-  function openCorrection(tx) { setCorrectionTxId(tx.id); setCorrectionNominal(tx.nominal); }
+  function openCorrection(t) {
+    let txId = null;
+    let nominal = 0;
+    
+    if (t.rumah_id || t.petugas) {
+      txId = t.id;
+      nominal = t.nominal;
+    } else {
+      const tx = transactions.find((tx) => tx.rumah_id === t.id || tx.rumah?.id === t.id);
+      if (tx) {
+        txId = tx.id;
+        nominal = tx.nominal;
+      }
+    }
+    
+    if (txId) {
+      setCorrectionTxId(txId);
+      setCorrectionNominal(nominal);
+    } else {
+      showToast("Data transaksi tidak ditemukan.");
+    }
+  }
   function closeCorrection() { setCorrectionTxId(null); }
 
   async function saveCorrection() {
