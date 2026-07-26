@@ -676,7 +676,12 @@ export default function useJimpitanViewModel(hasSession = true) {
   }
 
   function resolveQr(qrCode) {
-    const qr = (qrCode || "").trim().toUpperCase();
+    let qr = (qrCode || "").trim();
+    // Jika qr berupa URL lengkap (misal: https://sijigatak.vercel.app/scan/CODE123), ekstrak kode terakhirnya
+    if (qr.includes("/scan/")) {
+      qr = qr.split("/scan/").pop();
+    }
+    qr = qr.toUpperCase();
     return houses.find((h) => h.qr_code?.toUpperCase() === qr) || null;
   }
 
