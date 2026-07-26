@@ -615,11 +615,11 @@ export default function useJimpitanViewModel(hasSession = true) {
     setIsLoading(true);
     try {
       if (id) {
-        const res = await apiFetch("/api/rumah", { method: "PATCH", body: JSON.stringify({ id, nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, kelompok_id, nominal_default: Number(nominal_default) || 2000 }) });
+        const res = await apiFetch("/api/rumah", { method: "PATCH", body: JSON.stringify({ id, nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, kelompok_id, nominal_default: Number(nominal_default) || 500 }) });
         setHouses(houses.map((h) => h.id === id ? normalizeRumah(res.data) : h));
         showToast("Data rumah berhasil diperbarui.");
       } else {
-        const res = await apiFetch("/api/rumah", { method: "POST", body: JSON.stringify({ nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, kelompok_id, nominal_default: Number(nominal_default) || 2000 }) });
+        const res = await apiFetch("/api/rumah", { method: "POST", body: JSON.stringify({ nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, kelompok_id, nominal_default: Number(nominal_default) || 500 }) });
         setHouses([...houses, normalizeRumah(res.data)]);
         showToast("Rumah berhasil ditambahkan.");
       }
@@ -694,7 +694,7 @@ export default function useJimpitanViewModel(hasSession = true) {
       if (house.status !== "belum") { setSelectedHouseId(house.id); setScreen("detail"); setScanState("idle"); return; }
       
       // Jangan auto-save, cukup arahkan ke halaman detail agar petugas bisa konfirmasi nominal
-      const defaultNominal = house.nominal_default || 2000;
+      const defaultNominal = house.nominal_default || 500;
       setSelectedHouseId(house.id); 
       setNominalInput(defaultNominal);
       setScreen("detail");

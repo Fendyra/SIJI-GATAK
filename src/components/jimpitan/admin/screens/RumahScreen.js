@@ -147,7 +147,7 @@ export function RumahScreen({ vm }) {
             <option value="">-- Pilih Kelompok --</option>
             {vm.kelompokList.map((k) => <option key={k.id} value={k.id}>{k.nama}</option>)}
           </SelectField>
-          <InputField label="Nominal Jimpitan Default (Rp)" type="number" value={d.nominal_default} onChange={(e) => vm.onModalDataChange("nominal_default", e.target.value)} placeholder="2000" min="0" />
+          <InputField label="Nominal Jimpitan Default (Rp)" type="number" value={d.nominal_default} onChange={(e) => vm.onModalDataChange("nominal_default", e.target.value)} placeholder="500" min="0" />
           <ModalFooter onCancel={vm.closeModal} onSave={vm.saveRumah} saveLabel={d.id ? "Simpan Perubahan" : "Tambah Rumah"} />
         </Modal>
       )}
