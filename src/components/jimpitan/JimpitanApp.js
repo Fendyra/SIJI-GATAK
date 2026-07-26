@@ -109,7 +109,7 @@ function ProfileModal({ currentUser, onClose, onSave }) {
   );
 }
 
-const PETUGAS_SCREENS = ["dashboard", "list", "scan", "detail", "riwayat"];
+const PETUGAS_SCREENS = ["dashboard", "list", "scan", "detail", "riwayat", "success"];
 
 export default function JimpitanApp({ hasSession = true }) {
   const {
