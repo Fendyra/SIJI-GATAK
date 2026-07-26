@@ -6,13 +6,18 @@ export function QrScreen({ vm }) {
   async function downloadAll() {
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
-    const canvases = document.querySelectorAll("[data-qr-canvas]");
-    canvases.forEach((canvas) => {
-      const nama = canvas.getAttribute("data-nama") || "rumah";
-      const dataUrl = canvas.toDataURL("image/png");
-      const base64 = dataUrl.split(",")[1];
-      zip.file(`${nama}.png`, base64, { base64: true });
+    
+    vm.qrHouses.forEach((h) => {
+      const canvasId = `qr-canvas-${h.id}`;
+      const canvas = document.getElementById(canvasId);
+      if (canvas) {
+        const nama = h.nama?.replace(/[^a-zA-Z0-9 ]/g, "") || "rumah";
+        const dataUrl = canvas.toDataURL("image/png");
+        const base64 = dataUrl.split(",")[1];
+        zip.file(`${nama}.png`, base64, { base64: true });
+      }
     });
+
     const blob = await zip.generateAsync({ type: "blob" });
     const link = document.createElement("a");
     link.download = "QR-Code-Rumah.zip";
@@ -73,7 +78,6 @@ export function QrScreen({ vm }) {
                       style={{ animationDelay: `${index * 10}ms` }}>
                       <div className="mb-2 flex aspect-square w-full items-center justify-center rounded-[10px] bg-[#f6f4ee]">
                         <QrCanvas value={`${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${h.qr_code?.split('/').pop()}`} size={110} id={canvasId} />
-                        <canvas data-qr-canvas="true" data-nama={h.nama?.replace(/[^a-zA-Z0-9 ]/g, "") || "rumah"} id={`qr-dl-${h.id}`} style={{ display: "none" }} />
                       </div>
                       <div className="text-[13px] font-bold leading-tight">{h.nama}</div>
                       <div className="mb-2.5 text-[10px] text-muted-2">{h.alamat || rtName}</div>
