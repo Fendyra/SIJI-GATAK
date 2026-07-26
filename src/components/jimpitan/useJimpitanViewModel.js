@@ -692,12 +692,12 @@ export default function useJimpitanViewModel(hasSession = true) {
       if (!house) { setScanState("not_found"); showToast("QR Code tidak dikenali."); return; }
       if (house.status !== "belum") { setSelectedHouseId(house.id); setScreen("detail"); setScanState("idle"); return; }
       
-      // Auto-save transaction for successful scan
+      // Jangan auto-save, cukup arahkan ke halaman detail agar petugas bisa konfirmasi nominal
       const defaultNominal = house.nominal_default || 2000;
       setSelectedHouseId(house.id); 
-      setNominalInput(defaultNominal); 
+      setNominalInput(defaultNominal);
+      setScreen("detail");
       setScanState("idle");
-      autoSaveTransaction(house, defaultNominal, "sudah");
     }, 600);
   }
 
@@ -736,7 +736,7 @@ export default function useJimpitanViewModel(hasSession = true) {
   }
 
   function editTransactionForHouse(houseId) {
-    const tx = transactions.find((t) => t.rumah_id === houseId || t.rumah?.id === houseId);
+    const tx = transactions.find((t) => t.houseId === houseId);
     if (tx) openCorrection(tx);
   }
 
@@ -772,7 +772,7 @@ export default function useJimpitanViewModel(hasSession = true) {
       txId = t.id;
       nominal = t.nominal;
     } else {
-      const tx = transactions.find((tx) => tx.rumah_id === t.id || tx.rumah?.id === t.id);
+      const tx = transactions.find((tx) => tx.houseId === t.id);
       if (tx) {
         txId = tx.id;
         nominal = tx.nominal;
