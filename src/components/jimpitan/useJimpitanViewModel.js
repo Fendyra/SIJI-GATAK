@@ -657,10 +657,11 @@ export default function useJimpitanViewModel(hasSession = true) {
       if (house.status !== "belum") { setSelectedHouseId(house.id); setScreen("detail"); setScanState("idle"); return; }
       
       // Auto-save transaction for successful scan
+      const defaultNominal = house.nominal_default || 2000;
       setSelectedHouseId(house.id); 
-      setNominalInput(500); 
+      setNominalInput(defaultNominal); 
       setScanState("idle");
-      autoSaveTransaction(house, 500, "sudah");
+      autoSaveTransaction(house, defaultNominal, "sudah");
     }, 600);
   }
 

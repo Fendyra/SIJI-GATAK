@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { QRScanner } from "../components/QRScanner";
 
 const SvgHouse = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
@@ -13,6 +14,13 @@ const SvgHouse = () => (
 );
 
 export function ScanScreen({ vm }) {
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  const handleScan = (decodedText) => {
+    setIsScannerOpen(false);
+    vm.onQrScanned(decodedText);
+  };
+
   return (
     <div className="max-w-[800px] w-full">
       <div className="flex justify-between items-start mb-6">
@@ -34,12 +42,11 @@ export function ScanScreen({ vm }) {
         
         <div className="flex flex-col sm:flex-row gap-4">
           <button
-            onClick={vm.simulateScan}
-            disabled={vm.isScanning}
-            className="flex-shrink-0 flex items-center justify-center gap-2.5 cursor-pointer rounded-[12px] border-none bg-brand px-6 py-3.5 text-[14px] font-bold text-white transition-transform hover:bg-brand-dark active:scale-[0.98] disabled:cursor-default disabled:opacity-70 sm:w-auto w-full"
+            onClick={() => setIsScannerOpen(true)}
+            className="flex-shrink-0 flex items-center justify-center gap-2.5 cursor-pointer rounded-[12px] border-none bg-brand px-6 py-3.5 text-[14px] font-bold text-white transition-transform hover:bg-brand-dark active:scale-[0.98] sm:w-auto w-full"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
-            {vm.isScanning ? "Memindai..." : "Scan QR Rumah"}
+            Scan QR Rumah
           </button>
           
           <div className="relative flex-1">
@@ -57,13 +64,19 @@ export function ScanScreen({ vm }) {
         </div>
       </div>
 
-      {!vm.search && (
+      {!vm.search && !isScannerOpen && (
         <div className="flex flex-col items-center justify-center py-12">
           <SvgHouse />
           <div className="mt-6 text-[15px] font-extrabold text-gray-900">Belum ada rumah yang ditampilkan</div>
           <div className="mt-2 text-[13px] text-muted-2 text-center max-w-[300px]">
             Scan QR atau cari nama/alamat rumah untuk melihat data pengambilan.
           </div>
+        </div>
+      )}
+
+      {isScannerOpen && (
+        <div className="mb-8">
+          <QRScanner onScan={handleScan} onClose={() => setIsScannerOpen(false)} />
         </div>
       )}
 
