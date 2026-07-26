@@ -182,6 +182,7 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   const [selectedHouseId, setSelectedHouseId] = useState(null);
   const [nominalInput, setNominalInput] = useState(500);
+  const [isScannerUsed, setIsScannerUsed] = useState(false);
   const [search, setSearch] = useState("");
   const [scanState, setScanState] = useState("idle");
   const [scanQrInput, setScanQrInput] = useState("");
@@ -689,13 +690,14 @@ export default function useJimpitanViewModel(hasSession = true) {
   }
 
   function onQrScanned(qrCode) {
+    if (!qrCode) return;
+    setIsScannerUsed(true);
     setScanState("scanning");
     scanTimer.current = setTimeout(() => {
       const house = resolveQr(qrCode);
       if (!house) { setScanState("not_found"); showToast("QR Code tidak dikenali."); return; }
       if (house.status !== "belum") { setSelectedHouseId(house.id); setScreen("detail"); setScanState("idle"); return; }
       
-      // Jangan auto-save, cukup arahkan ke halaman detail agar petugas bisa konfirmasi nominal
       const defaultNominal = house.nominal_default || 500;
       setSelectedHouseId(house.id); 
       setNominalInput(defaultNominal);
@@ -733,9 +735,11 @@ export default function useJimpitanViewModel(hasSession = true) {
   }
 
   function selectHouseManual(id) {
+    setIsScannerUsed(false);
     const house = houses.find((h) => h.id === id);
-    if (!house || house.status !== "belum") return;
-    setScreen("detail"); setSelectedHouseId(id); setNominalInput(500);
+    if (!house) return;
+    if (house.status !== "belum") return; // Hanya yang belum bisa di klik
+    setScreen("detail"); setSelectedHouseId(id); setNominalInput(house.nominal_default || 500);
   }
 
   function editTransactionForHouse(houseId) {
@@ -762,11 +766,21 @@ export default function useJimpitanViewModel(hasSession = true) {
       }
       setTransactions((prev) => [newTx, ...prev]);
       
+      const now = new Date();
+      const dateFormatted = now.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+      const timeFormatted = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+      
       setLastSavedTx({
+        id: newTx.id,
         nama_penghuni: house.nama_penghuni,
         alamat: house.alamat,
+        kelompok: currentUser.kelompok_nama || "Kelompok",
+        rt_rw: `RT ${currentUser.rt} / RW ${currentUser.rw}`,
         nominal: nominal,
         status: status,
+        metode: isScannerUsed ? "Scan QR Code" : "Input Manual",
+        petugas: currentUser.nama || currentUser.username || "Petugas",
+        waktu: `${dateFormatted} · ${timeFormatted}`
       });
       setScreen("success");
       

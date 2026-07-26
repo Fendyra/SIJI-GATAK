@@ -46,7 +46,9 @@ export function ScanScreen({ vm }) {
             <h2 className="text-[17px] font-extrabold text-gray-900 mb-1">Scan QR Rumah</h2>
             <p className="text-[13px] text-muted-2 mb-4">Arahkan kamera ke QR code di rumah untuk melanjutkan</p>
             
-            <QRScanner onScan={handleScan} />
+            <div className="max-w-[360px] mx-auto w-full">
+              <QRScanner onScan={handleScan} />
+            </div>
           </div>
 
           <div className="bg-[#eaf3ec] rounded-[14px] p-4 flex items-start gap-3 mb-6 border border-[#c2e0cd]">
