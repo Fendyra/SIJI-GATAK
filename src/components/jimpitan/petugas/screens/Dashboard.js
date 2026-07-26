@@ -14,7 +14,7 @@ export function Dashboard({ vm }) {
         
         let periode = chartScale === "minggu" ? "mingguan" : chartScale === "bulan" ? "bulanan" : "tahunan";
         const res = await vm.apiFetch(`/api/rekap?periode=${periode}&kelompok_id=${kelId}`);
-        const trx = res.transaksi || [];
+        const trx = res.data?.transaksi || [];
         
         let bars = [];
         if (chartScale === "minggu") {
