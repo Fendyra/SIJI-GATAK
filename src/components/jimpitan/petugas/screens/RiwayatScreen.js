@@ -22,6 +22,9 @@ export function RiwayatScreen({ vm }) {
             type="date" 
             value={vm.riwayatDate}
             onChange={vm.onRiwayatDateChange}
+            onClick={(e) => {
+              try { e.target.showPicker(); } catch (err) {}
+            }}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
           />
           <div className="flex items-center gap-2 bg-white border border-card-border rounded-full px-4 py-2.5 text-sm font-bold text-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] group-hover:bg-gray-50 transition-colors">

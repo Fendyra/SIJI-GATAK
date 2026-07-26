@@ -893,24 +893,6 @@ export default function useJimpitanViewModel(hasSession = true) {
   const progressPct = total > 0 ? Math.round((doneHouses / total) * 100) : 0;
   const totalTerkumpul = transactions.filter((t) => t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
 
-  useEffect(() => {
-    if (trendBarsData.length > 0) {
-      setTrendBarsData(prev => {
-        const newBars = [...prev];
-        const lastBarIndex = newBars.length - 1;
-        if (newBars[lastBarIndex].total !== totalTerkumpul) {
-          newBars[lastBarIndex].total = totalTerkumpul;
-          const maxTotal = Math.max(...newBars.map(b => b.total), 1);
-          return newBars.map(b => ({
-            ...b,
-            heightPct: Math.max(Math.round((b.total / maxTotal) * 100), 4)
-          }));
-        }
-        return prev;
-      });
-    }
-  }, [totalTerkumpul]);
-
   const petugasActiveKey = screen === "detail" ? "scan" : screen; // maps detail screen to scan menu
   const petugasNavItems = [
     { key: "dashboard", label: "Dashboard" },
@@ -1049,6 +1031,11 @@ export default function useJimpitanViewModel(hasSession = true) {
     search, onSearchChange: (e) => setSearch(e.target.value), filteredHouses, noHousesFound: filteredHouses.length === 0,
     isScanning: scanState === "scanning", isScanIdle: scanState === "idle", isScanEmpty: scanState === "empty", isScanNotFound: scanState === "not_found",
     scanButtonLabel: scanState === "scanning" ? "Memindai…" : "Simulasikan Scan Berhasil",
+    trendBars: trendBarsData.length > 0 ? (() => {
+      const bars = [...trendBarsData];
+      bars[bars.length - 1] = { ...bars[bars.length - 1], total: totalTerkumpul };
+      return bars;
+    })() : [65, 80, 45, 90, 70, 55, 100].map((v, i) => ({ heightPct: v, label: ["Sen","Sel","Rab","Kam","Jum","Sab","Min"][i], total: i === 6 ? totalTerkumpul : 0 })),
     selectedHouse, isEditableSelected, isReadonlySelected: !!selectedHouseRaw && !isEditableSelected, editTransactionForHouse,
     nominalInput, onNominalChange: (e) => setNominalInput(e.target.value), saveSudah: () => saveTransaction("sudah"), saveKosong: () => saveTransaction("kosong"),
     riwayatFilters, riwayatFiltered, noRiwayat: riwayatFiltered.length === 0,
@@ -1062,7 +1049,6 @@ export default function useJimpitanViewModel(hasSession = true) {
     adminDashboardMonth, setAdminDashboardMonth,
     adminDashboardYear, setAdminDashboardYear,
     totalRumahAdmin: total, totalKelompok: kelompokList.length, totalPemasukanDisplay: toRupiah(adminDashboardPemasukan),
-    trendBars: trendBarsData.length > 0 ? trendBarsData : [65, 80, 45, 90, 70, 55, 100].map((v, i) => ({ heightPct: v, label: ["Sen","Sel","Rab","Kam","Jum","Sab","Min"][i] })),
     rtProgress,
     rtRows, kelompokRows, rtList, kelompokList,
     rumahSearch, onRumahSearchChange: (e) => setRumahSearch(e.target.value),
