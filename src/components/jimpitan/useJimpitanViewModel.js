@@ -319,8 +319,13 @@ export default function useJimpitanViewModel(hasSession = true) {
         d.setDate(d.getDate() - i);
         days.push({ dateStr: d.toISOString().split("T")[0], label: dayLabels[d.getDay()] });
       }
+      const isPetugas = currentUser?.role !== "admin" && currentUser?.kelompok_id;
       const results = await Promise.allSettled(
-        days.map((d) => apiFetch(`/api/rekap?periode=harian&tanggal=${d.dateStr}`))
+        days.map((d) => {
+          let url = `/api/rekap?periode=harian&tanggal=${d.dateStr}`;
+          if (isPetugas) url += `&kelompok_id=${currentUser.kelompok_id}`;
+          return apiFetch(url);
+        })
       );
       const bars = results.map((r, i) => ({
         label: days[i].label,
@@ -339,7 +344,7 @@ export default function useJimpitanViewModel(hasSession = true) {
         total: 0,
       })));
     }
-  }, []);
+  }, [currentUser]);
 
   const fetchAllData = useCallback(async (user) => {
     setIsLoading(true);
@@ -377,7 +382,7 @@ export default function useJimpitanViewModel(hasSession = true) {
             method: "POST",
             body: JSON.stringify({ kelompok_id: user.kelompok_id, petugas_id: user.id, tanggal: tanggalLokal }),
           }),
-          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&limit=1000`)
+          apiFetch(`/api/transaksi?tanggal=${tanggalLokal}&kelompok_id=${user.kelompok_id}&limit=1000`)
         ]);
 
         const rawHousesData = (rumahRes.data || []).map(normalizeRumah);
