@@ -125,14 +125,20 @@ export function AdminDashboard({ vm }) {
         {/* Line Chart */}
         <div className="bg-white rounded-2xl border border-card-border shadow-sm flex flex-col p-[22px]">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-[14px] font-bold text-gray-900">Tren Pemasukan 7 Hari Terakhir</h3>
-            <select className="text-[12px] font-bold text-muted-2 bg-transparent outline-none cursor-pointer">
-              <option>7 Hari Terakhir</option>
+            <h3 className="text-[14px] font-bold text-gray-900">Tren Pemasukan</h3>
+            <select 
+              value={vm.trendFilter || "minggu"} 
+              onChange={(e) => vm.setTrendFilter(e.target.value)}
+              className="text-[12px] font-bold text-muted-2 bg-transparent outline-none cursor-pointer"
+            >
+              <option value="minggu">7 Hari Terakhir</option>
+              <option value="bulan">1 Bulan Terakhir</option>
+              <option value="tahun">1 Tahun Terakhir</option>
             </select>
           </div>
           
           <div className="relative h-[220px] w-full flex-1 border-b border-gray-100 flex items-end">
-            <svg className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full overflow-visible">
               <defs>
                 <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#1f7a4d" stopOpacity="0.25" />
@@ -146,22 +152,22 @@ export function AdminDashboard({ vm }) {
                 const points = vm.trendBars.map((b, i) => {
                   const x = (i / (len - 1)) * 100;
                   const y = 100 - b.heightPct;
-                  return `${x}%,${y}%`;
+                  return `${x},${y}`;
                 }).join(" ");
-                const areaPoints = `0%,100% ${points} 100%,100%`;
+                const areaPoints = `0,100 ${points} 100,100`;
                 
                 return (
                   <>
                     <polygon points={areaPoints} fill="url(#trendGradient)" />
-                    <polyline points={points} fill="none" stroke="#1f7a4d" strokeWidth="2.5" />
+                    <polyline points={points} fill="none" stroke="#1f7a4d" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
                     {vm.trendBars.map((b, i) => {
                       const x = (i / (len - 1)) * 100;
                       const y = 100 - b.heightPct;
                       return (
                         <g key={i} className="group cursor-pointer">
-                          <circle cx={`${x}%`} cy={`${y}%`} r="5" fill="#fff" stroke="#1f7a4d" strokeWidth="2.5" className="transition-all group-hover:r-[7px] group-hover:fill-brand" />
-                          <rect x={`${x - 10}%`} y="0" width="20%" height="100%" fill="transparent" />
-                          <text x={`${x}%`} y={`${y - 5}%`} textAnchor="middle" className="text-[10px] font-bold fill-gray-800 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-white">
+                          <circle cx={x} cy={y} r="1.5" fill="#fff" stroke="#1f7a4d" strokeWidth="0.8" vectorEffect="non-scaling-stroke" className="transition-all group-hover:r-[2.5]" />
+                          <rect x={x - (100 / (len * 2))} y="0" width={100 / len} height="100" fill="transparent" />
+                          <text x={x} y={y - 8} textAnchor="middle" fontSize="4" className="font-bold fill-gray-800 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-white">
                             {toRupiah(b.total)}
                           </text>
                         </g>
@@ -173,9 +179,12 @@ export function AdminDashboard({ vm }) {
             </svg>
           </div>
           <div className="flex justify-between items-center mt-3 px-2">
-            {vm.trendBars.map((b, i) => (
-              <div key={i} className="text-[11px] font-bold text-muted-2 w-8 text-center">{b.label}</div>
-            ))}
+            {vm.trendBars.map((b, i) => {
+              const len = vm.trendBars.length;
+              // Show fewer labels if there are many data points (e.g., month view)
+              if (len > 12 && i % Math.ceil(len / 6) !== 0 && i !== len - 1) return null;
+              return <div key={i} className="text-[10px] font-bold text-muted-2 text-center">{b.label}</div>;
+            })}
           </div>
 
           <div className="grid grid-cols-3 gap-4 mt-6 pt-5 border-t border-gray-100">
@@ -264,7 +273,7 @@ export function AdminDashboard({ vm }) {
             ))}
           </div>
 
-          <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity">
+          <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity" onClick={vm.goToAdminRiwayat}>
             <span className="text-[12px] font-bold text-gray-900">Lihat detail progres</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </div>
@@ -274,19 +283,19 @@ export function AdminDashboard({ vm }) {
         <div className="bg-white rounded-2xl border border-card-border shadow-sm flex flex-col p-[22px]">
           <div className="flex justify-between items-center mb-5">
             <h3 className="text-[14px] font-bold text-gray-900">Transaksi Terbaru</h3>
-            <button className="text-[11px] font-bold bg-gray-50 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">Lihat semua</button>
+            <button onClick={vm.goToAdminRiwayat} className="text-[11px] font-bold bg-gray-50 border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">Lihat semua</button>
           </div>
 
           <div className="flex flex-col gap-1 flex-1">
             {vm.transaksiTerbaru.length > 0 ? (
               vm.transaksiTerbaru.map((t) => (
-                <div key={t.id} className="flex items-center gap-3 py-3 px-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group">
+                <div key={t.id} onClick={vm.goToAdminRiwayat} className="flex items-center gap-3 py-3 px-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group">
                   <div className="w-10 h-10 rounded-full bg-brand/10 text-brand flex items-center justify-center font-display font-extrabold text-[14px] shrink-0">
                     {t.nama.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] font-extrabold text-gray-900 truncate flex items-center gap-1.5">
-                      {t.nama} <span className="text-[11px] font-medium text-muted-2 truncate">- {t.alamat}</span>
+                      {t.nama} <span className="text-[11px] font-medium text-muted-2 truncate">- {t.alamat || "Alamat tidak tersedia"}</span>
                     </div>
                     <div className="text-[11px] font-medium text-muted-2 mt-0.5">{t.date}, {t.time}</div>
                   </div>

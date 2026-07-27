@@ -44,6 +44,7 @@ function normalizeTx(t) {
     kelompok: t.sesi?.kelompok?.nama || t.kelompok || "",
     nominal: t.nominal,
     status: t.status,
+    created_at: t.created_at,
     time: t.created_at
       ? new Date(t.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
       : "",
@@ -174,6 +175,7 @@ export default function useJimpitanViewModel(hasSession = true) {
   const [rekapData, setRekapData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [trendBarsData, setTrendBarsData] = useState([]);
+  const [trendFilter, setTrendFilter] = useState("minggu"); // minggu, bulan, tahun
   const [lastSavedTx, setLastSavedTx] = useState(null);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -316,28 +318,57 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   const fetchTrend = useCallback(async () => {
     try {
-      const days = [];
-      const dayLabels = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+      const dataPoints = [];
       const today = new Date();
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        days.push({ dateStr: d.toISOString().split("T")[0], label: dayLabels[d.getDay()] });
-      }
       const isPetugas = currentUser?.role !== "admin" && currentUser?.kelompok_id;
-      const results = await Promise.allSettled(
-        days.map((d) => {
-          let url = `/api/rekap?periode=harian&tanggal=${d.dateStr}`;
-          if (isPetugas) url += `&kelompok_id=${currentUser.kelompok_id}`;
-          return apiFetch(url);
-        })
-      );
-      const bars = results.map((r, i) => ({
-        label: days[i].label,
-        total: r.status === "fulfilled" ? (r.value.data?.totalTerkumpul || 0) : 0,
-      }));
-      const maxTotal = Math.max(...bars.map((b) => b.total), 1);
-      setTrendBarsData(bars.map((b) => ({
+      
+      if (trendFilter === "minggu") {
+        const dayLabels = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(d.getDate() - i);
+          dataPoints.push({ dateStr: d.toISOString().split("T")[0], label: dayLabels[d.getDay()], total: 0 });
+        }
+      } else if (trendFilter === "bulan") {
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(d.getDate() - i);
+          dataPoints.push({ dateStr: d.toISOString().split("T")[0], label: d.getDate().toString(), total: 0 });
+        }
+      } else if (trendFilter === "tahun") {
+        const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+        for (let i = 11; i >= 0; i--) {
+          const d = new Date(today);
+          d.setMonth(d.getMonth() - i);
+          dataPoints.push({ dateStr: `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`, label: monthLabels[d.getMonth()], total: 0 });
+        }
+      }
+
+      if (trendFilter === "tahun") {
+        const results = await Promise.allSettled(
+          dataPoints.map((dp) => apiFetch(`/api/rekap?periode=bulanan&bulan=${dp.dateStr}`))
+        );
+        results.forEach((r, i) => {
+          if (r.status === "fulfilled") dataPoints[i].total = r.value.data?.totalTerkumpul || 0;
+        });
+      } else {
+        const [txThisMonth, txLastMonth] = await Promise.all([
+          apiFetch(`/api/transaksi?bulan=${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}&limit=2000`),
+          apiFetch(`/api/transaksi?bulan=${today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear()}-${(today.getMonth() === 0 ? 12 : today.getMonth()).toString().padStart(2, '0')}&limit=2000`)
+        ]);
+        
+        let allTxs = [...(txThisMonth.data || []), ...(txLastMonth.data || [])];
+        if (isPetugas) {
+          allTxs = allTxs.filter(t => t.kelompok_id === currentUser.kelompok_id);
+        }
+        
+        dataPoints.forEach(dp => {
+          dp.total = allTxs.filter(t => t.status === "sudah" && t.created_at && t.created_at.startsWith(dp.dateStr)).reduce((sum, t) => sum + t.nominal, 0);
+        });
+      }
+
+      const maxTotal = Math.max(...dataPoints.map((b) => b.total), 1);
+      setTrendBarsData(dataPoints.map((b) => ({
         label: b.label,
         heightPct: Math.max(Math.round((b.total / maxTotal) * 100), 4),
         total: b.total,
@@ -349,7 +380,7 @@ export default function useJimpitanViewModel(hasSession = true) {
         total: 0,
       })));
     }
-  }, [currentUser]);
+  }, [currentUser, trendFilter]);
 
   const fetchAllData = useCallback(async (user, silent = false) => {
     if (!silent) setIsLoading(true);
@@ -420,6 +451,12 @@ export default function useJimpitanViewModel(hasSession = true) {
     }
   }, [fetchTrend]);
 
+  useEffect(() => {
+    if (currentUser) {
+      fetchTrend();
+    }
+  }, [trendFilter, fetchTrend, currentUser]);
+
   const fetchRekap = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -438,8 +475,30 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   const fetchAdminDashboardPemasukan = useCallback(async () => {
     try {
-      const res = await apiFetch(`/api/rekap?periode=bulanan&bulan=${adminDashboardYear}-${adminDashboardMonth}`);
-      setAdminDashboardPemasukan(res.data?.totalTerkumpul || 0);
+      const [rekapRes, txBulanRes, txHariIniRes] = await Promise.all([
+        apiFetch(`/api/rekap?periode=bulanan&bulan=${adminDashboardYear}-${adminDashboardMonth}`),
+        apiFetch(`/api/transaksi?bulan=${adminDashboardYear}-${adminDashboardMonth}&limit=1000`),
+        apiFetch(`/api/transaksi?tanggal=${new Date().toLocaleDateString('en-CA')}&limit=1000`)
+      ]);
+      setAdminDashboardPemasukan(rekapRes.data?.totalTerkumpul || 0);
+      
+      const txBulanList = (txBulanRes.data || []).map(normalizeTx);
+      setTransactions(txBulanList);
+      
+      const txHariIniList = (txHariIniRes.data || []).map(normalizeTx);
+      const txMapHariIni = {};
+      txHariIniList.forEach((t) => { txMapHariIni[t.houseId] = t; });
+      
+      setHouses((prev) => prev.map((h) => {
+        const tx = txMapHariIni[h.id];
+        if (!tx) return { ...h, status: "belum", lastNominal: null, lastTime: null };
+        return {
+          ...h,
+          status: tx.status,
+          lastNominal: tx.nominal,
+          lastTime: tx.time,
+        };
+      }));
     } catch (err) {
       setAdminDashboardPemasukan(0);
     }
