@@ -1000,7 +1000,41 @@ export default function useJimpitanViewModel(hasSession = true) {
   const totalPemasukanBulanIni = transactions.filter((t) => t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
   const sudahCount = houses.filter((h) => h.status === "sudah").length;
 
+  const transaksiBulanIniCount = transactions.filter((t) => t.status === "sudah").length;
 
+  const validTrendTotals = trendBarsData.map(b => b.total).filter(t => t > 0);
+  const rataRataHarian = validTrendTotals.length ? validTrendTotals.reduce((a,b)=>a+b,0) / validTrendTotals.length : 0;
+  const pemasukanTertinggi = validTrendTotals.length ? Math.max(...validTrendTotals) : 0;
+  const pemasukanTerendah = validTrendTotals.length ? Math.min(...validTrendTotals) : 0;
+  const trenSummary = { rataRataHarian, pemasukanTertinggi, pemasukanTerendah };
+
+  const distribusiRt = rtList.map(r => {
+    const rtHouses = houses.filter(h => h.rt === r.nama);
+    const rtTotal = transactions.filter(t => rtHouses.some(h => h.id === t.houseId) && t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
+    return { nama: r.nama, total: rtTotal };
+  }).filter(r => r.total > 0).sort((a,b) => b.total - a.total);
+  const totalDistribusi = distribusiRt.reduce((sum, r) => sum + r.total, 0);
+  const distribusiRtWithPct = distribusiRt.map(r => ({
+    ...r,
+    pct: totalDistribusi > 0 ? Math.round((r.total / totalDistribusi) * 100) : 0
+  }));
+
+  const transaksiTerbaru = [...transactions]
+    .filter(t => t.status === "sudah")
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 5)
+    .map(t => {
+      const h = houses.find(h => h.id === t.houseId || h.id === t.rumah_id);
+      return {
+        id: t.id,
+        nama: t.nama || h?.nama_penghuni || "Warga",
+        alamat: h?.alamat || "",
+        rt: h?.rt || "",
+        nominal: t.nominal,
+        time: new Date(t.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+        date: new Date(t.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+      };
+    });
 
   const rtProgress = rtList.map((rt) => {
     const rtHouses = houses.filter((h) => h.rt === rt.nama);
@@ -1112,6 +1146,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     adminDashboardMonth, setAdminDashboardMonth,
     adminDashboardYear, setAdminDashboardYear,
     totalRumahAdmin: total, totalKelompok: kelompokList.length, totalPemasukanDisplay: toRupiah(adminDashboardPemasukan),
+    transaksiBulanIniCount, trenSummary, distribusiRtWithPct, transaksiTerbaru,
     rtProgress,
     rtRows, kelompokRows, rtList, kelompokList,
     rumahSearch, onRumahSearchChange: (e) => setRumahSearch(e.target.value),
