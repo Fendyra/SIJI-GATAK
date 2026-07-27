@@ -58,7 +58,7 @@ export default function SuccessScreen({ vm }) {
       <div className="mb-6">
         <div className="font-display text-[22px] font-extrabold text-gray-900 mb-1">Pengambilan Jimpitan</div>
         <div className="text-[13px] font-medium text-muted-2">
-          {vm.kelompok} · {vm.rt}
+          {vm.kelompok}
         </div>
       </div>
 

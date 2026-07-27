@@ -122,7 +122,7 @@ export function RumahScreen({ vm }) {
               <div className="min-w-0">
                 <div className="text-sm font-bold">{h.nama}</div>
                 <div className="text-xs text-muted-2">
-                  {activeRt === "Semua" ? `${h.rt} · ` : ""}{h.kelompok || "-"}
+                  {h.rt || "Lainnya"}
                 </div>
               </div>
               <div className="flex flex-shrink-0 items-center gap-2">
@@ -143,10 +143,7 @@ export function RumahScreen({ vm }) {
             <option value="">-- Pilih RT --</option>
             {vm.rtList.map((r) => <option key={r.id} value={r.id}>{r.nama}</option>)}
           </SelectField>
-          <SelectField label="Kelompok Ronda" value={d.kelompok_id} onChange={(e) => vm.onModalDataChange("kelompok_id", e.target.value)}>
-            <option value="">-- Pilih Kelompok --</option>
-            {vm.kelompokList.map((k) => <option key={k.id} value={k.id}>{k.nama}</option>)}
-          </SelectField>
+
           <InputField label="Nominal Jimpitan Default (Rp)" type="number" value={d.nominal_default} onChange={(e) => vm.onModalDataChange("nominal_default", e.target.value)} placeholder="500" min="0" />
           <ModalFooter onCancel={vm.closeModal} onSave={vm.saveRumah} saveLabel={d.id ? "Simpan Perubahan" : "Tambah Rumah"} />
         </Modal>

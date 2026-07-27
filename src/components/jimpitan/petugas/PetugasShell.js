@@ -74,7 +74,7 @@ export default function PetugasShell({ vm }) {
                 Jimpitan Online 
               </div>
               <div className="text-[10px] text-muted-2 font-semibold mt-0.5">
-                {vm.petugasName} · {vm.rt}
+                {vm.petugasName}{vm.kelompok ? ` · ${vm.kelompok}` : ""}
               </div>
             </div>
           </button>

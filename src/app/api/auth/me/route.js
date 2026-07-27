@@ -24,10 +24,7 @@ export async function GET(request) {
         role,
         kelompok_id,
         kelompok:kelompok_id (
-          nama,
-          rt (
-            nama
-          )
+          nama
         )
       `)
       .eq("id", user.id)
@@ -45,7 +42,7 @@ export async function GET(request) {
       role: petugas.role,
       kelompok_id: petugas.kelompok_id,
       kelompok: petugas.kelompok?.nama || "",
-      rt: petugas.kelompok?.rt?.nama || "",
+      rt: "",
     };
 
     return Response.json({ user: currentUser });

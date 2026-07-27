@@ -23,12 +23,10 @@ export async function GET(request) {
       `)
       .order("nama_penghuni", { ascending: true });
 
-    const kelompokId = searchParams.get("kelompok_id");
     const rtId = searchParams.get("rt_id");
     const search = searchParams.get("search");
     const aktif = searchParams.get("aktif");
 
-    if (kelompokId) query = query.eq("kelompok_id", kelompokId);
     if (rtId) query = query.eq("rt_id", rtId);
     if (aktif !== null) query = query.eq("aktif", aktif !== "false");
     if (search) {
@@ -49,18 +47,18 @@ export async function GET(request) {
 
 /**
  * POST /api/rumah
- * Body: { nama_penghuni, alamat, rt_id, kelompok_id, nominal_default }
+ * Body: { nama_penghuni, alamat, rt_id, nominal_default }
  * QR code di-generate otomatis dari prefix + timestamp unik
  */
 export async function POST(request) {
   try {
     const supabase = await createClient();
     const body = await request.json();
-    const { nama_penghuni, alamat, rt_id, kelompok_id, nominal_default } = body;
+    const { nama_penghuni, alamat, rt_id, nominal_default } = body;
 
-    if (!nama_penghuni || !rt_id || !kelompok_id) {
+    if (!nama_penghuni || !rt_id) {
       return Response.json(
-        { error: "nama_penghuni, rt_id, dan kelompok_id wajib diisi." },
+        { error: "nama_penghuni dan rt_id wajib diisi." },
         { status: 400 }
       );
     }
@@ -74,7 +72,7 @@ export async function POST(request) {
         nama_penghuni,
         alamat: alamat || "",
         rt_id,
-        kelompok_id,
+        kelompok_id: null,
         nominal_default: nominal_default || 2000,
         qr_code,
         aktif: true,
@@ -97,20 +95,25 @@ export async function POST(request) {
 
 /**
  * PATCH /api/rumah
- * Body: { id, nama_penghuni?, alamat?, rt_id?, kelompok_id?, nominal_default?, aktif? }
+ * Body: { id, nama_penghuni?, alamat?, rt_id?, nominal_default?, aktif? }
  */
 export async function PATCH(request) {
   try {
     const supabase = await createClient();
-    const { id, ...fields } = await request.json();
+    const body = await request.json();
+    const { id, nama_penghuni, alamat, rt_id, nominal_default, aktif } = body;
 
     if (!id) {
       return Response.json({ error: "id rumah wajib diisi." }, { status: 400 });
     }
 
-    const allowed = ["nama_penghuni", "alamat", "rt_id", "kelompok_id", "nominal_default", "aktif"];
     const updates = {};
-    allowed.forEach((f) => { if (fields[f] !== undefined) updates[f] = fields[f]; });
+    if (nama_penghuni !== undefined) updates.nama_penghuni = nama_penghuni;
+    if (alamat !== undefined) updates.alamat = alamat;
+    if (rt_id !== undefined) updates.rt_id = rt_id;
+    updates.kelompok_id = null; // Enforce removing it
+    if (nominal_default !== undefined) updates.nominal_default = nominal_default;
+    if (aktif !== undefined) updates.aktif = aktif;
 
     const { data, error } = await supabase
       .from("rumah")
@@ -118,7 +121,8 @@ export async function PATCH(request) {
       .eq("id", id)
       .select(`
         id, nama_penghuni, alamat, nominal_default, qr_code, aktif,
-        rt:rt_id(id, nama), kelompok:kelompok_id(id, nama)
+        rt:rt_id(id, nama),
+        kelompok:kelompok_id(id, nama)
       `)
       .single();
 

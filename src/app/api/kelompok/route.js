@@ -30,15 +30,15 @@ export async function GET() {
 export async function POST(request) {
   try {
     const supabase = await createClient();
-    const { nama, rt_id, jadwal } = await request.json();
+    const { nama, jadwal } = await request.json();
 
-    if (!nama || !rt_id) {
-      return Response.json({ error: "nama dan rt_id wajib diisi." }, { status: 400 });
+    if (!nama) {
+      return Response.json({ error: "nama wajib diisi." }, { status: 400 });
     }
 
     const { data, error } = await supabase
       .from("kelompok")
-      .insert({ nama, rt_id, jadwal: jadwal || "" })
+      .insert({ nama, rt_id: null, jadwal: jadwal || "" })
       .select(`id, nama, jadwal, rt:rt_id(id, nama)`)
       .single();
 
@@ -53,12 +53,12 @@ export async function POST(request) {
 
 /**
  * PATCH /api/kelompok
- * Body: { id, nama?, rt_id?, jadwal? }
+ * Body: { id, nama?, jadwal? }
  */
 export async function PATCH(request) {
   try {
     const supabase = await createClient();
-    const { id, nama, rt_id, jadwal } = await request.json();
+    const { id, nama, jadwal } = await request.json();
 
     if (!id) {
       return Response.json({ error: "id kelompok wajib diisi." }, { status: 400 });
@@ -66,8 +66,8 @@ export async function PATCH(request) {
 
     const updates = {};
     if (nama !== undefined) updates.nama = nama;
-    if (rt_id !== undefined) updates.rt_id = rt_id;
     if (jadwal !== undefined) updates.jadwal = jadwal;
+    updates.rt_id = null;
 
     const { data, error } = await supabase
       .from("kelompok")

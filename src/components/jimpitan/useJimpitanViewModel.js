@@ -583,16 +583,16 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   // ── CRUD Kelompok ─────────────────────────────────────────────────────────
   async function saveKelompok() {
-    const { id, nama, rt_id, jadwal } = modalData;
-    if (!nama?.trim() || !rt_id) { showToast("Nama dan RT harus diisi."); return; }
+    const { id, nama, jadwal } = modalData;
+    if (!nama?.trim()) { showToast("Nama harus diisi."); return; }
     setIsLoading(true);
     try {
       if (id) {
-        const res = await apiFetch("/api/kelompok", { method: "PATCH", body: JSON.stringify({ id, nama: nama.trim(), rt_id, jadwal: jadwal || "" }) });
+        const res = await apiFetch("/api/kelompok", { method: "PATCH", body: JSON.stringify({ id, nama: nama.trim(), jadwal: jadwal || "" }) });
         setKelompokList(kelompokList.map((k) => k.id === id ? res.data : k));
         showToast("Kelompok berhasil diperbarui.");
       } else {
-        const res = await apiFetch("/api/kelompok", { method: "POST", body: JSON.stringify({ nama: nama.trim(), rt_id, jadwal: jadwal || "" }) });
+        const res = await apiFetch("/api/kelompok", { method: "POST", body: JSON.stringify({ nama: nama.trim(), jadwal: jadwal || "" }) });
         setKelompokList([...kelompokList, res.data]);
         showToast("Kelompok berhasil ditambahkan.");
       }
@@ -613,16 +613,16 @@ export default function useJimpitanViewModel(hasSession = true) {
 
   // ── CRUD Rumah ────────────────────────────────────────────────────────────
   async function saveRumah() {
-    const { id, nama_penghuni, alamat, rt_id, kelompok_id, nominal_default } = modalData;
-    if (!nama_penghuni?.trim() || !rt_id || !kelompok_id) { showToast("Nama penghuni, RT, dan Kelompok harus diisi."); return; }
+    const { id, nama_penghuni, alamat, rt_id, nominal_default } = modalData;
+    if (!nama_penghuni?.trim() || !rt_id) { showToast("Nama penghuni dan RT harus diisi."); return; }
     setIsLoading(true);
     try {
       if (id) {
-        const res = await apiFetch("/api/rumah", { method: "PATCH", body: JSON.stringify({ id, nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, kelompok_id, nominal_default: Number(nominal_default) || 500 }) });
+        const res = await apiFetch("/api/rumah", { method: "PATCH", body: JSON.stringify({ id, nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, nominal_default: Number(nominal_default) || 500 }) });
         setHouses(houses.map((h) => h.id === id ? normalizeRumah(res.data) : h));
         showToast("Data rumah berhasil diperbarui.");
       } else {
-        const res = await apiFetch("/api/rumah", { method: "POST", body: JSON.stringify({ nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, kelompok_id, nominal_default: Number(nominal_default) || 500 }) });
+        const res = await apiFetch("/api/rumah", { method: "POST", body: JSON.stringify({ nama_penghuni: nama_penghuni.trim(), alamat: alamat || "", rt_id, nominal_default: Number(nominal_default) || 500 }) });
         setHouses([...houses, normalizeRumah(res.data)]);
         showToast("Rumah berhasil ditambahkan.");
       }

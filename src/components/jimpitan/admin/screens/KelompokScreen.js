@@ -27,7 +27,7 @@ export function KelompokScreen({ vm }) {
             <div className="flex flex-wrap items-start justify-between gap-2.5">
               <div>
                 <div className="text-sm font-bold">{k.nama}</div>
-                <div className="mb-1.5 text-xs text-muted-2">Jadwal: {k.jadwal || "-"} · {k.rt?.nama || "-"}</div>
+                <div className="mb-1.5 text-xs text-muted-2">Jadwal: {k.jadwal || "-"}</div>
               </div>
               <div className="flex gap-2">
                 <button onClick={k.onEdit} className="cursor-pointer rounded-lg border border-input-border bg-white px-3 py-[7px] text-xs font-bold">Ubah</button>
@@ -42,10 +42,7 @@ export function KelompokScreen({ vm }) {
         <Modal onClose={vm.closeModal}>
           <ModalHeader title={d.id ? "Ubah Kelompok" : "Tambah Kelompok Baru"} />
           <InputField label="Nama Kelompok" value={d.nama} onChange={(e) => vm.onModalDataChange("nama", e.target.value)} placeholder="mis. Ronda Melati" />
-          <SelectField label="RT" value={d.rt_id} onChange={(e) => vm.onModalDataChange("rt_id", e.target.value)}>
-            <option value="">-- Pilih RT --</option>
-            {vm.rtList.map((r) => <option key={r.id} value={r.id}>{r.nama}</option>)}
-          </SelectField>
+
           <InputField label="Jadwal Ronda" value={d.jadwal} onChange={(e) => vm.onModalDataChange("jadwal", e.target.value)} placeholder="mis. Senin, Rabu, Jumat" />
           <ModalFooter onCancel={vm.closeModal} onSave={vm.saveKelompok} saveLabel={d.id ? "Simpan Perubahan" : "Tambah Kelompok"} />
         </Modal>
