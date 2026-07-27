@@ -1,5 +1,5 @@
 export { AdminDashboard } from './AdminDashboard';
-export { RtScreen } from './RtScreen';
+export { JadwalRondaScreen } from './JadwalRondaScreen';
 export { KelompokScreen } from './KelompokScreen';
 export { RumahScreen } from './RumahScreen';
 export { QrScreen } from './QrScreen';

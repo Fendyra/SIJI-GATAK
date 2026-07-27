@@ -2,7 +2,7 @@
 
 import {
   AdminDashboard,
-  RtScreen,
+  JadwalRondaScreen,
   KelompokScreen,
   RumahScreen,
   QrScreen,
@@ -92,7 +92,7 @@ export default function AdminShell({ vm }) {
 
       <div className="min-w-0 flex-1 overflow-y-auto" style={{ padding: vm.contentPadding }}>
         {vm.isAdminDashboard ? <AdminDashboard vm={vm} /> : null}
-        {vm.isRt ? <RtScreen vm={vm} /> : null}
+        {vm.isJadwalRonda ? <JadwalRondaScreen vm={vm} /> : null}
         {vm.isKelompok ? <KelompokScreen vm={vm} /> : null}
         {vm.isAdminRumah ? <RumahScreen vm={vm} /> : null}
         {vm.isQr ? <QrScreen vm={vm} /> : null}

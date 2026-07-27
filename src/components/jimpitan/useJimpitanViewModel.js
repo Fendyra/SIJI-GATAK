@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const ADMIN_NAV_DEFS = [
   { key: "admin-dashboard", label: "Dashboard" },
-  { key: "admin-rt", label: "Data RT" },
+  { key: "admin-jadwal", label: "Jadwal Petugas" },
   { key: "admin-kelompok", label: "Data Kelompok" },
   { key: "admin-rumah", label: "Data Rumah" },
   { key: "admin-qr", label: "QR Code Rumah" },
@@ -1086,7 +1086,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     selectedHouse, isEditableSelected, isReadonlySelected: !!selectedHouseRaw && !isEditableSelected, editTransactionForHouse,
     nominalInput, onNominalChange: (e) => setNominalInput(e.target.value), saveSudah: () => saveTransaction("sudah"), saveKosong: () => saveTransaction("kosong"),
     riwayatFilters, riwayatFiltered, noRiwayat: riwayatFiltered.length === 0,
-    isAdminDashboard: screen === "admin-dashboard", isRt: screen === "admin-rt", isKelompok: screen === "admin-kelompok",
+    isAdminDashboard: screen === "admin-dashboard", isJadwalRonda: screen === "admin-jadwal", isKelompok: screen === "admin-kelompok",
     isAdminRumah: screen === "admin-rumah", isQr: screen === "admin-qr", isPetugasAkun: screen === "admin-petugas",
     isAdminRiwayat: screen === "admin-riwayat", isRekap: screen === "admin-rekap", isSetting: screen === "admin-setting",
     isAdminPetugasDetail: screen === "admin-petugas-detail", isAdminShell: screen.startsWith("admin-"),
