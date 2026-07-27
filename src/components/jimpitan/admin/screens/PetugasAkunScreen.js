@@ -75,6 +75,7 @@ export function PetugasAkunScreen({ vm }) {
                       <div className="flex flex-shrink-0 items-center gap-2">
                         <div className="rounded-full px-2.5 py-1 text-[11px] font-bold" style={{ background: p.statusBg, color: p.statusColor }}>{p.statusLabel}</div>
                         <button onClick={p.onEdit} className="cursor-pointer rounded-lg border border-input-border bg-white px-3 py-[7px] text-xs font-bold transition-colors hover:border-brand hover:text-brand">Ubah</button>
+                        <button onClick={p.onDelete} className="cursor-pointer rounded-lg border border-input-border bg-white px-3 py-[7px] text-xs font-bold transition-colors hover:border-danger hover:text-danger">Hapus</button>
                         <button onClick={p.onToggle} className="cursor-pointer rounded-lg border border-input-border bg-white px-3 py-[7px] text-xs font-bold transition-colors hover:border-danger hover:text-danger">{p.toggleLabel}</button>
                         <button onClick={() => vm.openPetugasDetail(p)} className="cursor-pointer rounded-lg border border-transparent bg-brand text-white px-3 py-[7px] text-xs font-bold transition-colors hover:bg-brand-dark shadow-sm">Detail Kinerja</button>
                       </div>
@@ -86,6 +87,10 @@ export function PetugasAkunScreen({ vm }) {
           );
         })}
       </div>
+
+      {vm.modalType === "hapus-petugas" && (
+        <ConfirmDelete title="Hapus Akun Petugas" message={`Apakah Anda yakin ingin menghapus akun ${d.nama}? Akun yang dihapus tidak dapat dipulihkan.`} onConfirm={vm.deletePetugas} onCancel={vm.closeModal} />
+      )}
 
       {isModalOpen && (
         <Modal onClose={vm.closeModal}>

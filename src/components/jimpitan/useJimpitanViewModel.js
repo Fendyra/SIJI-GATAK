@@ -679,6 +679,21 @@ export default function useJimpitanViewModel(hasSession = true) {
     } catch (err) { showToast("Gagal update status: " + err.message); }
   }
 
+  async function deletePetugas() {
+    if (!modalData.id) return;
+    setIsLoading(true);
+    try {
+      await apiFetch(`/api/petugas?id=${modalData.id}`, { method: "DELETE" });
+      setPetugasAccounts(petugasAccounts.filter((p) => p.id !== modalData.id));
+      showToast("Petugas berhasil dihapus.");
+      closeModal();
+    } catch (err) {
+      showToast("Gagal menghapus petugas: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function resolveQr(qrCode) {
     let qr = (qrCode || "").trim();
     // Jika qr berupa URL lengkap (misal: https://sijigatak.vercel.app/scan/CODE123), ekstrak kode terakhirnya
@@ -1003,6 +1018,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     toggleLabel: p.aktif ? "Nonaktifkan" : "Aktifkan",
     onToggle: () => toggleAccountStatus(p.id),
     onEdit: () => openModal("ubah-petugas", { id: p.id, nama: p.nama, kelompok_id: p.kelompok?.id || null }),
+    onDelete: () => openModal("hapus-petugas", p),
   }));
 
   const kelompokFilterOptions = [
@@ -1122,7 +1138,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     persentaseRt, onPersentaseRtChange: (e) => setPersentaseRt(Number(e.target.value)),
     persentaseRonda, onPersentaseRondaChange: (e) => setPersentaseRonda(Number(e.target.value)), saveSetting,
     modalType, modalData, onModalDataChange: (field, value) => setModalData((prev) => ({ ...prev, [field]: value })),
-    closeModal, saveRt, deleteRt, saveKelompok, deleteKelompok, saveRumah, deleteRumah, savePetugas, openModal,
+    closeModal, saveRt, deleteRt, saveKelompok, deleteKelompok, saveRumah, deleteRumah, savePetugas, deletePetugas, openModal,
     openProfile: () => setIsProfileOpen(true),
     stopPropagation: (e) => e.stopPropagation(),
   };

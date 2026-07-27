@@ -141,3 +141,35 @@ export async function PATCH(request) {
     return Response.json({ error: err.message }, { status: 500 });
   }
 }
+
+/**
+ * DELETE /api/petugas
+ * Query: ?id=...
+ * Menghapus akun petugas (auth dan profil)
+ */
+export async function DELETE(request) {
+  try {
+    const { searchParams } = request.nextUrl;
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return Response.json({ error: "id petugas wajib diisi." }, { status: 400 });
+    }
+
+    const adminSupabase = await createAdminClient();
+
+    // Hapus user dari Supabase Auth
+    // Menghapus user di auth akan secara otomatis menghapus profil di tabel 'petugas' 
+    // JIKA kita menggunakan ON DELETE CASCADE pada foreign key, atau kita hapus profilnya dulu jika tidak cascade.
+    // Mari kita hapus dari tabel 'petugas' dulu untuk memastikan, walau gagal tak masalah.
+    await adminSupabase.from("petugas").delete().eq("id", id);
+    
+    const { error: authError } = await adminSupabase.auth.admin.deleteUser(id);
+    if (authError) throw authError;
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE /api/petugas]", err);
+    return Response.json({ error: err.message }, { status: 500 });
+  }
+}

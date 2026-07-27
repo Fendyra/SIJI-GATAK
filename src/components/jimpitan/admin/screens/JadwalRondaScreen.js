@@ -1,4 +1,5 @@
 import React from "react";
+import { ConfirmDelete } from "../../ui/SharedUI";
 
 export function JadwalRondaScreen({ vm }) {
   // Filter only 'petugas' role (exclude admin)
@@ -52,14 +53,23 @@ export function JadwalRondaScreen({ vm }) {
                           <div className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded uppercase">Off</div>
                         )}
                       </div>
-                      <button 
-                        onClick={p.onToggle}
-                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${p.aktif ? 'bg-brand' : 'bg-gray-300'}`}
-                        title={p.aktif ? 'Klik untuk mengubah status jadi Off' : 'Klik untuk mengaktifkan kembali'}
-                      >
-                        <span className="sr-only">Toggle status</span>
-                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${p.aktif ? 'translate-x-4' : 'translate-x-0'}`} />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={p.onToggle}
+                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${p.aktif ? 'bg-brand' : 'bg-gray-300'}`}
+                          title={p.aktif ? 'Klik untuk mengubah status jadi Off' : 'Klik untuk mengaktifkan kembali'}
+                        >
+                          <span className="sr-only">Toggle status</span>
+                          <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${p.aktif ? 'translate-x-4' : 'translate-x-0'}`} />
+                        </button>
+                        <button 
+                          onClick={p.onDelete}
+                          className="text-gray-400 hover:text-danger hover:bg-danger/10 p-1 rounded-md transition-colors cursor-pointer"
+                          title="Hapus Petugas"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -68,6 +78,15 @@ export function JadwalRondaScreen({ vm }) {
           );
         })}
       </div>
+
+      {vm.modalType === "hapus-petugas" && (
+        <ConfirmDelete 
+          title="Hapus Akun Petugas" 
+          message={`Apakah Anda yakin ingin menghapus akun ${vm.modalData?.nama}? Akun yang dihapus tidak dapat dipulihkan.`} 
+          onConfirm={vm.deletePetugas} 
+          onCancel={vm.closeModal} 
+        />
+      )}
     </div>
   );
 }
