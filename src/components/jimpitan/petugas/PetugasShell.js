@@ -95,13 +95,13 @@ export default function PetugasShell({ vm }) {
         </div>
         
         {/* FOOTER */}
-        <div className="mt-8 border-t border-gray-100 pt-6 pb-2 flex flex-col items-center justify-center gap-3">
-          <div className="text-[12px] text-gray-400 font-medium text-center">Sistem Informasi Jimpitan &middot; Dikembangkan dengan ❤️ untuk Dusun Gatak</div>
-          <a href="#" className="flex items-center gap-2 bg-gradient-to-r from-brand to-brand-deep px-4 py-2 rounded-xl text-white shadow-md shadow-brand/20 hover:scale-105 hover:shadow-lg transition-all duration-300 group cursor-pointer no-underline mb-4 sm:mb-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-            <span className="font-bold text-[13px] tracking-wide">Kelompok KKN UPNYK 84.036</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-70 group-hover:opacity-100 transition-opacity group-hover:translate-x-1 duration-300"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </a>
+        <div className="mt-8 border-t border-gray-200 pt-6 pb-6 flex flex-col items-center justify-center gap-1.5 text-center px-4">
+          <div className="text-[12px] text-gray-500">
+            &copy; {new Date().getFullYear()} <strong className="font-extrabold text-gray-700">SIAP GATAK</strong> &mdash; Sistem Informasi Administrasi dan Pelayanan Dusun Gatak
+          </div>
+          <div className="text-[12px] text-gray-500">
+            Dikembangkan sebagai <strong className="font-extrabold text-gray-700">Program Kerja Individu KKN UPN &quot;Veteran&quot; Yogyakarta 84.036</strong> oleh <strong className="font-extrabold text-brand">Fendyra Restu Dewangga</strong>
+          </div>
         </div>
       </div>
 
