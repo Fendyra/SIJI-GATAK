@@ -19,6 +19,12 @@ function getDayIndex(jadwalStr) {
 
 export function JadwalRondaScreen({ vm }) {
   const [activeTab, setActiveTab] = useState("Kalender Jadwal");
+  const [sortOrder, setSortOrder] = useState("asc"); // asc or desc
+  const [expandedCells, setExpandedCells] = useState({});
+
+  const toggleExpand = (kelompokId) => {
+    setExpandedCells(prev => ({ ...prev, [kelompokId]: !prev[kelompokId] }));
+  };
 
   // Filter only 'petugas' role (exclude admin)
   const petugasOnly = vm.petugasRows.filter(p => p.role === "petugas");
@@ -31,6 +37,12 @@ export function JadwalRondaScreen({ vm }) {
     return acc;
   }, {});
 
+  // Sort kelompokList
+  const sortedKelompokList = [...vm.kelompokList].sort((a, b) => {
+    if (sortOrder === "asc") return a.nama.localeCompare(b.nama);
+    return b.nama.localeCompare(a.nama);
+  });
+
   return (
     <div className="max-w-[1200px] pb-10">
       {/* HEADER */}
@@ -40,11 +52,7 @@ export function JadwalRondaScreen({ vm }) {
           <div className="text-[14px] text-muted-2 mt-0.5">Kelola jadwal ronda petugas di setiap malamnya</div>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 bg-white border border-input-border text-gray-700 font-bold text-[13px] rounded-xl px-4 py-2 hover:bg-gray-50 transition-colors shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-            Impor Jadwal
-          </button>
-          <button className="flex items-center gap-2 bg-brand text-white font-bold text-[13px] rounded-xl px-4 py-2 hover:bg-brand-deep transition-colors shadow-sm shadow-brand/20">
+          <button onClick={() => vm.openModal("tambah-kelompok")} className="flex items-center gap-2 bg-brand text-white font-bold text-[13px] rounded-xl px-4 py-2 hover:bg-brand-deep transition-colors shadow-sm shadow-brand/20">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             Buat Jadwal
           </button>
@@ -69,13 +77,14 @@ export function JadwalRondaScreen({ vm }) {
         </div>
         
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
-            <button className="px-3 py-1 text-[11px] font-bold rounded-md bg-white shadow-sm text-gray-900">Mingguan</button>
-            <button className="px-3 py-1 text-[11px] font-bold rounded-md text-gray-500 hover:text-gray-900">Bulanan</button>
-          </div>
-          <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 font-bold text-[12px] rounded-lg px-3 py-1.5 hover:bg-gray-50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            Filter
+          <button 
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 font-bold text-[12px] rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            Filter: {sortOrder === "asc" ? "A-Z" : "Z-A"}
           </button>
         </div>
       </div>
@@ -97,9 +106,11 @@ export function JadwalRondaScreen({ vm }) {
                 </tr>
               </thead>
               <tbody>
-                {vm.kelompokList.map((kelompok, idx) => {
+                {sortedKelompokList.map((kelompok, idx) => {
                   const members = groupedByKelompok[kelompok.id] || [];
                   const dayIndex = getDayIndex(kelompok.jadwal);
+                  const isExpanded = expandedCells[kelompok.id];
+                  const displayMembers = isExpanded ? members : members.slice(0, 3);
                   
                   return (
                     <tr key={kelompok.id} className={`border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/10'}`}>
@@ -123,7 +134,7 @@ export function JadwalRondaScreen({ vm }) {
                           <td key={day.key} className="py-3 px-2 align-top border-l border-gray-100/50">
                             {isMatch ? (
                               <div className="flex flex-col gap-2">
-                                {members.map(m => (
+                                {displayMembers.map(m => (
                                   <div key={m.id} className="flex items-center gap-2 group p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer">
                                     <div className="relative shrink-0">
                                       <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center text-[10px] font-extrabold font-display">
@@ -144,6 +155,11 @@ export function JadwalRondaScreen({ vm }) {
                                     </div>
                                   </div>
                                 ))}
+                                {members.length > 3 && (
+                                  <button onClick={() => toggleExpand(kelompok.id)} className="text-[11px] font-bold text-brand hover:text-brand-deep text-left px-2 py-1 mt-1 transition-colors">
+                                    {isExpanded ? "Tutup" : `Lihat ${members.length - 3} lainnya...`}
+                                  </button>
+                                )}
                               </div>
                             ) : (
                               <div className="w-full h-full min-h-[40px]"></div>
