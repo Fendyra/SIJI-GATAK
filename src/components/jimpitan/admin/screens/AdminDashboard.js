@@ -137,7 +137,7 @@ export function AdminDashboard({ vm }) {
             </select>
           </div>
           
-          <div className="relative h-[220px] w-full flex-1 border-b border-gray-100 flex items-end">
+          <div className="relative h-[220px] w-full shrink-0 border-b border-gray-100 flex items-end mt-4">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full overflow-visible">
               <defs>
                 <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
