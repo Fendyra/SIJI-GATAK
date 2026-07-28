@@ -35,8 +35,8 @@ export function AdminDashboard({ vm }) {
               >
                 {[...Array(12)].map((_, i) => {
                   const val = (i + 1).toString().padStart(2, '0');
-                  const label = new Date(2000, i, 1).toLocaleString('id-ID', { month: 'short' });
-                  return <option key={val} value={val}>{label} 2026</option>;
+                  const label = new Date(2000, i, 1).toLocaleString('id-ID', { month: 'long' });
+                  return <option key={val} value={val}>{label}</option>;
                 })}
               </select>
             </div>
@@ -145,7 +145,6 @@ export function AdminDashboard({ vm }) {
                   <stop offset="100%" stopColor="#1f7a4d" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              {/* Build coordinates for SVG */}
               {(() => {
                 const len = vm.trendBars.length;
                 if(len === 0) return null;
@@ -155,26 +154,33 @@ export function AdminDashboard({ vm }) {
                   return `${x},${y}`;
                 }).join(" ");
                 const areaPoints = `0,100 ${points} 100,100`;
-                
                 return (
                   <>
                     <polygon points={areaPoints} fill="url(#trendGradient)" />
                     <polyline points={points} fill="none" stroke="#1f7a4d" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
-                    {vm.trendBars.map((b, i) => {
-                      const x = (i / (len - 1)) * 100;
-                      const y = 100 - b.heightPct;
-                      return (
-                        <g key={i} className="group cursor-pointer">
-                          <circle cx={x} cy={y} r="1.5" fill="#fff" stroke="#1f7a4d" strokeWidth="0.8" vectorEffect="non-scaling-stroke" className="transition-all group-hover:r-[2.5]" />
-                          <rect x={x - (100 / (len * 2))} y="0" width={100 / len} height="100" fill="transparent" />
-                          <text x={x} y={y - 8} textAnchor="middle" fontSize="4" className="font-bold fill-gray-800 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-white">
-                            {toRupiah(b.total)}
-                          </text>
-                        </g>
-                      );
-                    })}
                   </>
                 );
+              })()}
+            </svg>
+            <svg className="absolute inset-0 w-full h-full overflow-visible">
+              {(() => {
+                const len = vm.trendBars.length;
+                if(len === 0) return null;
+                return vm.trendBars.map((b, i) => {
+                  const x = (i / (len - 1)) * 100;
+                  const y = 100 - b.heightPct;
+                  return (
+                    <g key={i} className="group cursor-pointer">
+                      <circle cx={`${x}%`} cy={`${y}%`} r="4" fill="#fff" stroke="#1f7a4d" strokeWidth="2.5" className="transition-all group-hover:r-[6px]" />
+                      <rect x={`${x - (100 / (len * 2))}%`} y="0" width={`${100 / len}%`} height="100%" fill="transparent" />
+                      <g className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <text x={`${x}%`} y={`${y}%`} dy="-12" textAnchor="middle" className="text-[12px] font-bold fill-gray-800">
+                          {toRupiah(b.total)}
+                        </text>
+                      </g>
+                    </g>
+                  );
+                });
               })()}
             </svg>
           </div>

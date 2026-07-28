@@ -1206,6 +1206,7 @@ export default function useJimpitanViewModel(hasSession = true) {
     adminDashboardYear, setAdminDashboardYear,
     totalRumahAdmin: total, totalKelompok: kelompokList.length, totalPemasukanDisplay: toRupiah(adminDashboardPemasukan),
     transaksiBulanIniCount, trenSummary, distribusiRtWithPct, transaksiTerbaru,
+    trendFilter, setTrendFilter,
     rtProgress,
     rtRows, kelompokRows, rtList, kelompokList,
     rumahSearch, onRumahSearchChange: (e) => setRumahSearch(e.target.value),
