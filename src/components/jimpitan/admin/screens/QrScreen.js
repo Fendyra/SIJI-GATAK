@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { QrCanvas, downloadQr } from "../../ui/SharedUI";
 
 export function QrScreen({ vm }) {
+  const [isDownloading, setIsDownloading] = useState(false);
   const [activeRt, setActiveRt] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,27 +54,51 @@ export function QrScreen({ vm }) {
   const handlePageClick = (page) => { setCurrentPage(page); };
 
   async function downloadAll() {
-    const { default: JSZip } = await import("jszip");
-    const zip = new JSZip();
-    
-    // Only download the currently filtered list so it aligns with "Cetak Semua" expectation
-    processedData.forEach((h) => {
-      const canvasId = `qr-canvas-${h.id}`;
-      const canvas = document.getElementById(canvasId);
-      if (canvas) {
-        const nama = (h.nama_penghuni || "rumah").replace(/[^a-zA-Z0-9 ]/g, "");
-        const dataUrl = canvas.toDataURL("image/png");
-        const base64 = dataUrl.split(",")[1];
-        zip.file(`${nama}.png`, base64, { base64: true });
-      }
-    });
+    setIsDownloading(true);
+    try {
+      const { default: JSZip } = await import("jszip");
+      const QRCode = await import("qrcode");
+      const zip = new JSZip();
+      
+      const nameCounts = {};
+      
+      // Only download the currently filtered list so it aligns with "Cetak Semua" expectation
+      // Generate QR codes on the fly instead of relying on DOM canvas (fixes pagination issue)
+      for (const h of processedData) {
+        let nama = (h.nama_penghuni || "rumah").replace(/[^a-zA-Z0-9 ]/g, "");
+        if (!nameCounts[nama]) {
+          nameCounts[nama] = 1;
+        } else {
+          nameCounts[nama]++;
+          nama = `${nama}-${nameCounts[nama]}`;
+        }
 
-    const blob = await zip.generateAsync({ type: "blob" });
-    const link = document.createElement("a");
-    link.download = "QR-Code-Rumah.zip";
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    URL.revokeObjectURL(link.href);
+        const qrUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${h.qr_code?.split('/').pop()}`;
+        
+        try {
+          const dataUrl = await QRCode.toDataURL(qrUrl, {
+            width: 300,
+            margin: 1,
+            color: { dark: "#1c2420", light: "#ffffff" },
+          });
+          const base64 = dataUrl.split(",")[1];
+          zip.file(`${nama}.png`, base64, { base64: true });
+        } catch (err) {
+          console.error("Error generating QR for", nama, err);
+        }
+      }
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement("a");
+      link.download = "QR-Code-Rumah.zip";
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("Download ZIP error:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   }
 
   function printAll() {
@@ -121,9 +146,13 @@ export function QrScreen({ vm }) {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Cetak Semua
           </button>
-          <button onClick={downloadAll} className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-white font-bold text-[13px] hover:bg-brand-deep transition-colors shadow-sm shadow-brand/20 shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Unduh Semua (ZIP)
+          <button onClick={downloadAll} disabled={isDownloading} className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-white font-bold text-[13px] hover:bg-brand-deep transition-colors shadow-sm shadow-brand/20 shrink-0 disabled:opacity-70">
+            {isDownloading ? (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            )}
+            {isDownloading ? "Mengemas..." : "Unduh Semua (ZIP)"}
           </button>
         </div>
       </div>
