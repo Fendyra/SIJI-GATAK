@@ -123,18 +123,6 @@ export function RekapScreen({ vm }) {
           <div className="font-display text-[24px] font-extrabold text-gray-900">Rekapitulasi &amp; Laporan</div>
           <div className="text-[14px] text-muted-2 mt-0.5">Pantau pemasukan jimpitan dan kelola laporan dengan mudah.</div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand cursor-pointer hover:bg-brand/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold">
-            A
-          </div>
-          <div className="hidden sm:block">
-            <div className="text-[13px] font-bold text-gray-900">Admin Utama</div>
-            <div className="text-[11px] text-gray-500">Administrator</div>
-          </div>
-        </div>
       </div>
 
       {/* FILTER & EXPORT ACTION BAR */}
