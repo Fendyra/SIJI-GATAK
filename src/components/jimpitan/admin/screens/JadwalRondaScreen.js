@@ -129,13 +129,12 @@ export function JadwalRondaScreen({ vm }) {
 
                       {/* Day Columns */}
                       {DAYS.map((day, dIdx) => {
-                        const membersInThisColumn = members.filter((_, mIdx) => mIdx % 7 === dIdx);
-                        
+                        const isMatch = dIdx === dayIndex;
                         return (
                           <td key={day.key} className="py-3 px-2 align-top border-l border-gray-100/50">
-                            {membersInThisColumn.length > 0 ? (
+                            {isMatch ? (
                               <div className="flex flex-col gap-2">
-                                {membersInThisColumn.map(m => (
+                                {displayMembers.map(m => (
                                   <div key={m.id} className="flex items-center gap-2 group p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer">
                                     <div className="relative shrink-0">
                                       <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center text-[10px] font-extrabold font-display">
@@ -156,6 +155,11 @@ export function JadwalRondaScreen({ vm }) {
                                     </div>
                                   </div>
                                 ))}
+                                {members.length > 3 && (
+                                  <button onClick={() => toggleExpand(kelompok.id)} className="text-[11px] font-bold text-brand hover:text-brand-deep text-left px-2 py-1 mt-1 transition-colors">
+                                    {isExpanded ? "Tutup" : `Lihat ${members.length - 3} lainnya...`}
+                                  </button>
+                                )}
                               </div>
                             ) : (
                               <div className="w-full h-full min-h-[40px]"></div>
