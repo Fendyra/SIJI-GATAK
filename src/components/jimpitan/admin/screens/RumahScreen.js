@@ -57,12 +57,33 @@ export function RumahScreen({ vm }) {
 
   const handleNextPage = () => { if (safeCurrentPage < totalPages) setCurrentPage(safeCurrentPage + 1); };
   const handlePrevPage = () => { if (safeCurrentPage > 1) setCurrentPage(safeCurrentPage - 1); };
+  const handlePageClick = (page) => { setCurrentPage(page); };
 
   // Handle Tab change
   const handleTabChange = (tab) => {
     setActiveRt(tab);
     setCurrentPage(1);
+    setSelectedIds([]); // Clear selection on tab change
   };
+
+  // Checkbox logic
+  const [selectedIds, setSelectedIds] = useState([]);
+  
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedIds(paginatedData.map(h => h.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
+    );
+  };
+
+  const isAllSelected = paginatedData.length > 0 && selectedIds.length === paginatedData.length;
 
   return (
     <div className="max-w-[1200px] pb-10">
@@ -81,7 +102,7 @@ export function RumahScreen({ vm }) {
               type="text" 
               placeholder="Cari nama warga, RT, atau dukuhan..." 
               value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); setSelectedIds([]); }}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all bg-white"
             />
           </div>
@@ -116,8 +137,8 @@ export function RumahScreen({ vm }) {
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th className="py-4 px-5 w-[60px] text-[12px] font-bold text-gray-500 font-display text-center">
-                  <div className="w-4 h-4 rounded border border-gray-300 mx-auto"></div>
+                <th className="py-4 px-5 w-[60px] text-center">
+                  <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} className="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand cursor-pointer accent-brand" />
                 </th>
                 <th className="py-4 px-5 text-[12px] font-bold text-gray-500 font-display">Nama Warga</th>
                 <th className="py-4 px-5 text-[12px] font-bold text-gray-500 font-display text-center">RT / Dukuhan</th>
@@ -133,11 +154,12 @@ export function RumahScreen({ vm }) {
                 </tr>
               ) : paginatedData.map((h, idx) => {
                 const initial = (h.nama_penghuni || "?").charAt(0).toUpperCase();
+                const isSelected = selectedIds.includes(h.id);
                 
                 return (
-                  <tr key={h.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                  <tr key={h.id} className={`border-b border-gray-100 transition-colors hover:bg-gray-50/50 ${isSelected ? 'bg-brand/5' : ''}`}>
                     <td className="py-4 px-5 text-center">
-                      <div className="w-4 h-4 rounded border border-gray-300 mx-auto bg-gray-50/50"></div>
+                      <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(h.id)} className="w-4 h-4 rounded border-gray-300 text-brand focus:ring-brand cursor-pointer accent-brand" />
                     </td>
                     <td className="py-4 px-5">
                       <div className="flex items-center gap-3">
@@ -181,41 +203,50 @@ export function RumahScreen({ vm }) {
         {/* Pagination Footer */}
         <div className="p-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-gray-500 font-medium">
           <div>
-            Menampilkan {totalItems === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + itemsPerPage, totalItems)} dari {totalItems} data
+            Menampilkan {totalItems === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + itemsPerPage, totalItems)} dari {totalItems} data {selectedIds.length > 0 && <span className="text-brand font-bold">({selectedIds.length} dipilih)</span>}
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-gray-400">10 / halaman</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <span className="text-gray-400">{itemsPerPage} / halaman</span>
             </div>
             <div className="flex items-center gap-1 border-l border-gray-200 pl-3">
               <button 
                 onClick={handlePrevPage}
                 disabled={safeCurrentPage === 1}
-                className={`p-1.5 rounded-lg border ${safeCurrentPage === 1 ? 'border-gray-100 text-gray-300' : 'border-gray-200 text-gray-600 hover:bg-gray-50'} transition-colors`}
+                className={`p-1.5 rounded-lg border ${safeCurrentPage === 1 ? 'border-gray-100 text-gray-300 cursor-not-allowed' : 'border-gray-200 text-gray-600 hover:bg-gray-50 cursor-pointer'} transition-colors`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
               </button>
-              <button className="w-7 h-7 rounded-lg bg-green-50 text-green-700 border border-green-200 font-bold flex items-center justify-center text-[12px]">
-                {safeCurrentPage}
-              </button>
-              {totalPages > safeCurrentPage && (
-                <button className="w-7 h-7 rounded-lg text-gray-500 font-medium flex items-center justify-center text-[12px]">
-                  {safeCurrentPage + 1}
-                </button>
-              )}
-              {totalPages > safeCurrentPage + 1 && (
-                <>
-                  <span className="text-gray-400 mx-1">...</span>
-                  <button className="w-7 h-7 rounded-lg text-gray-500 font-medium flex items-center justify-center text-[12px]">
-                    {totalPages}
-                  </button>
-                </>
-              )}
+              
+              {/* Generate Page Numbers */}
+              {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                // Logic to show a window of pages around current page
+                let pageNum = safeCurrentPage - 2 + i;
+                if (safeCurrentPage <= 3) pageNum = i + 1;
+                else if (safeCurrentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                
+                if (pageNum > 0 && pageNum <= totalPages) {
+                  return (
+                    <button 
+                      key={pageNum}
+                      onClick={() => handlePageClick(pageNum)}
+                      className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center text-[12px] cursor-pointer transition-colors ${
+                        safeCurrentPage === pageNum 
+                        ? 'bg-green-50 text-green-700 border border-green-200' 
+                        : 'text-gray-500 hover:bg-gray-100 border border-transparent hover:border-gray-200'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                }
+                return null;
+              })}
+              
               <button 
                 onClick={handleNextPage}
                 disabled={safeCurrentPage >= totalPages}
-                className={`p-1.5 rounded-lg border ${safeCurrentPage >= totalPages ? 'border-gray-100 text-gray-300' : 'border-gray-200 text-gray-600 hover:bg-gray-50'} transition-colors`}
+                className={`p-1.5 rounded-lg border ${safeCurrentPage >= totalPages ? 'border-gray-100 text-gray-300 cursor-not-allowed' : 'border-gray-200 text-gray-600 hover:bg-gray-50 cursor-pointer'} transition-colors`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </button>
