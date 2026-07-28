@@ -42,6 +42,7 @@ function normalizeTx(t) {
     houseId: t.rumah_id || t.rumah?.id,
     nama: t.rumah?.nama_penghuni || t.nama || "",
     kelompok: t.sesi?.kelompok?.nama || t.kelompok || "",
+    petugas: t.petugas?.nama || t.petugas || "",
     nominal: t.nominal,
     status: t.status,
     created_at: t.created_at,
@@ -300,9 +301,13 @@ export default function useJimpitanViewModel(hasSession = true) {
           const tx = txMap[h.id];
           return {
             ...h,
+            txId: tx ? tx.id : null,
             status: tx ? tx.status : "belum",
             lastNominal: tx ? tx.nominal : 0,
             lastTime: tx ? new Date(tx.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "",
+            petugas: tx ? tx.petugas?.nama || tx.petugas || "-" : "-",
+            time: tx ? new Date(tx.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
+            created_at: tx ? tx.created_at : null,
           };
         });
         
@@ -1143,7 +1148,8 @@ export default function useJimpitanViewModel(hasSession = true) {
     displayValue: t.status === "sudah" ? toRupiah(t.nominal || t.lastNominal) : t.status === "kosong" ? "Kosong" : "Belum", 
     statusBg: t.status === "sudah" ? "#e8f3ec" : t.status === "kosong" ? "#fbeee0" : "#f1efe7", 
     statusColor: t.status === "sudah" ? "#1f7a4d" : t.status === "kosong" ? "#b5691f" : "#8a8578",
-    onClick: () => adminRiwayatMode === "harian" ? openRiwayatDetail(t) : openCorrection(t)
+    // Remove the onClick here because we'll handle it inside RiwayatTransaksiScreen locally
+    // to show the detail modal
   }));
 
   const rekapTotal = rekapData?.totalTerkumpul ?? totalTerkumpul;
