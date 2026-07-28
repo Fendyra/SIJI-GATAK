@@ -1160,13 +1160,36 @@ export default function useJimpitanViewModel(hasSession = true) {
   const rekapPersentase = rekapData?.persentase ?? { rt: persentaseRt, ronda: persentaseRonda };
   const rekapPerRt = (rekapData?.perRt ?? rtList.map((r) => {
     const rtHouses = houses.filter((h) => h.rt === r.nama);
-    const rtTotal = transactions.filter((t) => rtHouses.some((h) => h.id === t.houseId) && t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
-    return { nama: r.nama, total: rtTotal };
-  }));
+    const txList = transactions.filter((t) => rtHouses.some((h) => h.id === t.houseId) && t.status === "sudah");
+    const rtTotal = txList.reduce((sum, t) => sum + t.nominal, 0);
+    return { nama: r.nama, total: rtTotal, count: txList.length };
+  })).map((r) => {
+    const rtHousesCount = houses.filter((h) => h.rt === r.nama).length;
+    return {
+      ...r,
+      display: toRupiah(r.total),
+      totalRumah: rtHousesCount,
+      sudahBayar: r.count || 0,
+      belumKosong: rtHousesCount - (r.count || 0),
+      progress: rtHousesCount > 0 ? ((r.count || 0) / rtHousesCount) * 100 : 0
+    };
+  });
+
   const rekapPerKelompok = (rekapData?.perKelompok ?? kelompokList.map((k) => {
-    const kTotal = transactions.filter((t) => t.kelompok === k.nama && t.status === "sudah").reduce((sum, t) => sum + t.nominal, 0);
-    return { nama: k.nama, total: kTotal };
-  }));
+    const txList = transactions.filter((t) => t.kelompok === k.nama && t.status === "sudah");
+    const kTotal = txList.reduce((sum, t) => sum + t.nominal, 0);
+    return { nama: k.nama, total: kTotal, count: txList.length };
+  })).map((k) => {
+    const kHousesCount = houses.filter((h) => h.kelompok === k.nama).length;
+    return {
+      ...k,
+      display: toRupiah(k.total),
+      totalRumah: kHousesCount,
+      sudahBayar: k.count || 0,
+      belumKosong: kHousesCount - (k.count || 0),
+      progress: kHousesCount > 0 ? ((k.count || 0) / kHousesCount) * 100 : 0
+    };
+  });
 
   const rtRows = rtList.map((r) => ({
     ...r,
