@@ -4,6 +4,8 @@ import { Modal, ModalHeader, ModalFooter, ConfirmDelete, InputField, SelectField
 
 export function RekapScreen({ vm }) {
   const [filterRt, setFilterRt] = useState("Semua RT");
+  const [showAllRt, setShowAllRt] = useState(false);
+  const [showAllKelompok, setShowAllKelompok] = useState(false);
 
   function exportExcel() {
     import("xlsx").then(({ utils, writeFile }) => {
@@ -83,13 +85,13 @@ export function RekapScreen({ vm }) {
         </div>
         <h2>Rekap per RT</h2>
         <table>
-          <tr><th>RT</th><th>Total</th><th>Sudah Bayar</th><th>Kosong</th></tr>
-          ${(vm.rekapPerRt || []).map((r) => `<tr><td>${r.nama}</td><td>${r.display}</td><td>${r.sudahBayar}</td><td>${r.belumKosong}</td></tr>`).join("")}
+          <tr><th>RT</th><th>Total Pemasukan</th><th>Sudah Bayar</th><th>Belum/Kosong</th><th>Total Rumah</th><th>Progress</th></tr>
+          ${(vm.rekapPerRt || []).map((r) => `<tr><td>${r.nama}</td><td>${r.display}</td><td>${r.sudahBayar}</td><td>${r.belumKosong}</td><td>${r.totalRumah}</td><td>${r.progress?.toFixed(1)}%</td></tr>`).join("")}
         </table>
         <h2>Rekap per Kelompok</h2>
         <table>
-          <tr><th>Kelompok</th><th>Total</th><th>Sudah Bayar</th><th>Kosong</th></tr>
-          ${(vm.rekapPerKelompok || []).map((k) => `<tr><td>${k.nama}</td><td>${k.display}</td><td>${k.sudahBayar}</td><td>${k.belumKosong}</td></tr>`).join("")}
+          <tr><th>Kelompok</th><th>Total Pemasukan</th><th>Sudah Bayar</th><th>Belum/Kosong</th><th>Total Rumah</th><th>Progress</th></tr>
+          ${(vm.rekapPerKelompok || []).map((k) => `<tr><td>${k.nama}</td><td>${k.display}</td><td>${k.sudahBayar}</td><td>${k.belumKosong}</td><td>${k.totalRumah}</td><td>${k.progress?.toFixed(1)}%</td></tr>`).join("")}
         </table>
       </body>
       </html>
@@ -107,6 +109,10 @@ export function RekapScreen({ vm }) {
 
   // Filtered RT
   const filteredRekapRt = filterRt === "Semua RT" ? vm.rekapPerRt : (vm.rekapPerRt || []).filter(r => r.nama === filterRt);
+
+  // Derived Activity Data
+  const highestRt = (vm.rekapPerRt || []).slice().sort((a, b) => b.total - a.total)[0];
+  const txTodayCount = (vm.transactions || []).filter(t => t.status === "sudah" && new Date(t.created_at).toDateString() === new Date().toDateString()).length;
 
   return (
     <div className="max-w-[1200px] pb-10">
@@ -164,11 +170,11 @@ export function RekapScreen({ vm }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button onClick={exportPdf} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-brand bg-white text-brand font-bold text-[13px] hover:bg-brand/5 transition-colors">
+          <button onClick={exportPdf} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-brand bg-white text-brand font-bold text-[13px] hover:bg-brand/5 transition-colors cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Ekspor PDF
           </button>
-          <button onClick={exportExcel} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-brand bg-brand text-white font-bold text-[13px] hover:bg-brand-deep transition-colors">
+          <button onClick={exportExcel} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-brand bg-brand text-white font-bold text-[13px] hover:bg-brand-deep transition-colors cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             Ekspor Excel
           </button>
@@ -275,8 +281,8 @@ export function RekapScreen({ vm }) {
         <div className="bg-white rounded-2xl border border-card-border shadow-sm p-6 flex-1 overflow-hidden flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <div className="font-bold text-[16px] text-gray-900">Rekap per RT</div>
-            <button className="text-[12px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors">
-              Lihat Semua
+            <button onClick={() => setShowAllRt(!showAllRt)} className="text-[12px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors cursor-pointer">
+              {showAllRt ? "Tampilkan Sedikit" : "Lihat Semua"}
             </button>
           </div>
           
@@ -296,7 +302,7 @@ export function RekapScreen({ vm }) {
                   <tr>
                     <td colSpan="5" className="py-8 text-center text-[13px] text-gray-400">Tidak ada data untuk filter yang dipilih.</td>
                   </tr>
-                ) : (filteredRekapRt || []).slice(0, 5).map((r, i) => (
+                ) : (filteredRekapRt || []).slice(0, showAllRt ? undefined : 5).map((r, i) => (
                   <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                     <td className="py-3.5 text-[13px] font-bold text-gray-900">{r.nama}</td>
                     <td className="py-3.5 text-[13px] font-bold text-gray-600">{r.display}</td>
@@ -315,9 +321,11 @@ export function RekapScreen({ vm }) {
               </tbody>
             </table>
           </div>
-          <div className="mt-auto pt-4 text-brand font-bold text-[13px] cursor-pointer hover:underline inline-flex items-center gap-1 w-max">
-            Lihat Semua RT <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
+          {!showAllRt && (filteredRekapRt || []).length > 5 && (
+            <div onClick={() => setShowAllRt(true)} className="mt-auto pt-4 text-brand font-bold text-[13px] cursor-pointer hover:underline inline-flex items-center gap-1 w-max">
+              Lihat Semua RT <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+          )}
         </div>
       </div>
 
@@ -327,8 +335,8 @@ export function RekapScreen({ vm }) {
         <div className="bg-white rounded-2xl border border-card-border shadow-sm p-6 flex-[2] overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div className="font-bold text-[16px] text-gray-900">Rekap per Kelompok</div>
-            <button className="text-[12px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors">
-              Lihat Semua
+            <button onClick={() => setShowAllKelompok(!showAllKelompok)} className="text-[12px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 transition-colors cursor-pointer">
+              {showAllKelompok ? "Tampilkan Sedikit" : "Lihat Semua"}
             </button>
           </div>
           
@@ -349,7 +357,7 @@ export function RekapScreen({ vm }) {
                   <tr>
                     <td colSpan="6" className="py-8 text-center text-[13px] text-gray-400">Belum ada data kelompok.</td>
                   </tr>
-                ) : (vm.rekapPerKelompok || []).slice(0, 5).map((k, i) => (
+                ) : (vm.rekapPerKelompok || []).slice(0, showAllKelompok ? undefined : 5).map((k, i) => (
                   <tr key={i} onClick={() => vm.setSelectedRekapKelompok(k)} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer group">
                     <td className="py-3.5 text-[13px] font-bold text-gray-900 group-hover:text-brand transition-colors">{k.nama}</td>
                     <td className="py-3.5 text-[13px] font-bold text-gray-600">{k.totalRumah}</td>
@@ -369,12 +377,14 @@ export function RekapScreen({ vm }) {
               </tbody>
             </table>
           </div>
-          <div className="mt-4 pt-2 text-brand font-bold text-[13px] cursor-pointer hover:underline inline-flex items-center gap-1">
-            Lihat Semua Kelompok <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
+          {!showAllKelompok && (vm.rekapPerKelompok || []).length > 5 && (
+            <div onClick={() => setShowAllKelompok(true)} className="mt-4 pt-2 text-brand font-bold text-[13px] cursor-pointer hover:underline inline-flex items-center gap-1">
+              Lihat Semua Kelompok <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+          )}
         </div>
 
-        {/* Ringkasan Aktivitas (Mock for UI) */}
+        {/* Ringkasan Aktivitas (Data Valid) */}
         <div className="bg-white rounded-2xl border border-card-border shadow-sm p-6 flex-1 lg:max-w-[320px]">
           <div className="font-bold text-[16px] text-gray-900 mb-6">Ringkasan Aktivitas</div>
           <div className="flex flex-col gap-6 relative">
@@ -384,44 +394,52 @@ export function RekapScreen({ vm }) {
               <div className="w-8 h-8 rounded-full bg-[#f0f9f4] flex items-center justify-center text-brand shrink-0 border-2 border-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <div className="pt-0.5">
-                <div className="text-[13px] font-bold text-gray-900">Pemasukan tertinggi</div>
-                <div className="text-[12px] text-gray-500 mt-0.5">RT 4 - Rp450.000</div>
+              <div className="pt-0.5 w-full">
+                <div className="flex justify-between items-start">
+                  <div className="text-[13px] font-bold text-gray-900">Pemasukan tertinggi</div>
+                  <div className="text-[11px] font-bold text-gray-400 pt-0.5">{highestRt ? "Terkini" : ""}</div>
+                </div>
+                <div className="text-[12px] text-gray-500 mt-0.5">{highestRt ? `${highestRt.nama} - ${highestRt.display}` : "Belum ada"}</div>
               </div>
-              <div className="ml-auto text-[11px] font-bold text-gray-400 pt-1">14:30</div>
             </div>
 
             <div className="flex gap-4 relative z-10">
               <div className="w-8 h-8 rounded-full bg-[#f0f9f4] flex items-center justify-center text-brand shrink-0 border-2 border-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <div className="pt-0.5">
-                <div className="text-[13px] font-bold text-gray-900">Update data rumah</div>
-                <div className="text-[12px] text-gray-500 mt-0.5">5 rumah diperbarui</div>
+              <div className="pt-0.5 w-full">
+                <div className="flex justify-between items-start">
+                  <div className="text-[13px] font-bold text-gray-900">Data Rumah Terdaftar</div>
+                  <div className="text-[11px] font-bold text-gray-400 pt-0.5">Selalu up-to-date</div>
+                </div>
+                <div className="text-[12px] text-gray-500 mt-0.5">Total {totalRumahAll} rumah tercatat</div>
               </div>
-              <div className="ml-auto text-[11px] font-bold text-gray-400 pt-1">11:45</div>
             </div>
 
             <div className="flex gap-4 relative z-10">
               <div className="w-8 h-8 rounded-full bg-[#f0f9f4] flex items-center justify-center text-brand shrink-0 border-2 border-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <div className="pt-0.5">
-                <div className="text-[13px] font-bold text-gray-900">Pembayaran terbanyak</div>
-                <div className="text-[12px] text-gray-500 mt-0.5">Hari ini - 23 pembayaran</div>
+              <div className="pt-0.5 w-full">
+                <div className="flex justify-between items-start">
+                  <div className="text-[13px] font-bold text-gray-900">Riwayat Penarikan Hari Ini</div>
+                  <div className="text-[11px] font-bold text-gray-400 pt-0.5">Hari ini</div>
+                </div>
+                <div className="text-[12px] text-gray-500 mt-0.5">{txTodayCount > 0 ? `${txTodayCount} pembayaran` : "Belum ada"}</div>
               </div>
-              <div className="ml-auto text-[11px] font-bold text-gray-400 pt-1">10:20</div>
             </div>
 
             <div className="flex gap-4 relative z-10">
               <div className="w-8 h-8 rounded-full bg-[#f0f9f4] flex items-center justify-center text-brand shrink-0 border-2 border-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <div className="pt-0.5">
-                <div className="text-[13px] font-bold text-gray-900">Laporan diekspor</div>
-                <div className="text-[12px] text-gray-500 mt-0.5">Excel - {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</div>
+              <div className="pt-0.5 w-full">
+                <div className="flex justify-between items-start">
+                  <div className="text-[13px] font-bold text-gray-900">Status Laporan</div>
+                  <div className="text-[11px] font-bold text-gray-400 pt-0.5">Real-time</div>
+                </div>
+                <div className="text-[12px] text-gray-500 mt-0.5">Siap diunduh PDF / Excel</div>
               </div>
-              <div className="ml-auto text-[11px] font-bold text-gray-400 pt-1">09:15</div>
             </div>
           </div>
         </div>
