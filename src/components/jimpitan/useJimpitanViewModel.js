@@ -319,7 +319,14 @@ export default function useJimpitanViewModel(hasSession = true) {
   const fetchTrend = useCallback(async () => {
     try {
       const dataPoints = [];
-      const today = new Date();
+      let baseDate = new Date();
+      if (currentUser?.role === "admin") {
+        const isCurrentMonth = baseDate.getFullYear() == adminDashboardYear && (baseDate.getMonth() + 1) == adminDashboardMonth;
+        if (!isCurrentMonth) {
+          baseDate = new Date(adminDashboardYear, adminDashboardMonth, 0); 
+        }
+      }
+      const today = baseDate;
       const isPetugas = currentUser?.role !== "admin" && currentUser?.kelompok_id;
       
       if (trendFilter === "minggu") {
@@ -333,7 +340,8 @@ export default function useJimpitanViewModel(hasSession = true) {
         for (let i = 29; i >= 0; i--) {
           const d = new Date(today);
           d.setDate(d.getDate() - i);
-          dataPoints.push({ dateStr: d.toISOString().split("T")[0], label: d.getDate().toString(), total: 0 });
+          const shortMonth = d.toLocaleString('id-ID', { month: 'short' });
+          dataPoints.push({ dateStr: d.toISOString().split("T")[0], label: `${d.getDate()} ${shortMonth}`, total: 0 });
         }
       } else if (trendFilter === "tahun") {
         const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -380,7 +388,7 @@ export default function useJimpitanViewModel(hasSession = true) {
         total: 0,
       })));
     }
-  }, [currentUser, trendFilter]);
+  }, [currentUser, trendFilter, adminDashboardMonth, adminDashboardYear]);
 
   const fetchAllData = useCallback(async (user, silent = false) => {
     if (!silent) setIsLoading(true);
