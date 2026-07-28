@@ -28,7 +28,14 @@ export async function GET(request) {
     const aktif = searchParams.get("aktif");
 
     if (rtId) query = query.eq("rt_id", rtId);
-    if (aktif !== null) query = query.eq("aktif", aktif !== "false");
+    
+    // Default to aktif=true if not specified
+    if (aktif === "false") {
+      query = query.eq("aktif", false);
+    } else if (aktif !== "all") {
+      query = query.eq("aktif", true);
+    }
+
     if (search) {
       query = query.or(
         `nama_penghuni.ilike.%${search}%,alamat.ilike.%${search}%`
