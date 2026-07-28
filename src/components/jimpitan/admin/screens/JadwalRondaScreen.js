@@ -52,9 +52,9 @@ export function JadwalRondaScreen({ vm }) {
           <div className="text-[14px] text-muted-2 mt-0.5">Kelola jadwal ronda petugas di setiap malamnya</div>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => vm.openModal("tambah-kelompok")} className="flex items-center gap-2 bg-brand text-white font-bold text-[13px] rounded-xl px-4 py-2 hover:bg-brand-deep transition-colors shadow-sm shadow-brand/20">
+          <button onClick={vm.goToAdminPetugas} className="flex items-center gap-2 bg-brand text-white font-bold text-[13px] rounded-xl px-4 py-2 hover:bg-brand-deep transition-colors shadow-sm shadow-brand/20">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Buat Jadwal
+            Tambah Anggota
           </button>
         </div>
       </div>
@@ -129,12 +129,13 @@ export function JadwalRondaScreen({ vm }) {
 
                       {/* Day Columns */}
                       {DAYS.map((day, dIdx) => {
-                        const isMatch = dIdx === dayIndex;
+                        const membersInThisColumn = members.filter((_, mIdx) => mIdx % 7 === dIdx);
+                        
                         return (
                           <td key={day.key} className="py-3 px-2 align-top border-l border-gray-100/50">
-                            {isMatch ? (
+                            {membersInThisColumn.length > 0 ? (
                               <div className="flex flex-col gap-2">
-                                {displayMembers.map(m => (
+                                {membersInThisColumn.map(m => (
                                   <div key={m.id} className="flex items-center gap-2 group p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer">
                                     <div className="relative shrink-0">
                                       <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center text-[10px] font-extrabold font-display">
@@ -155,11 +156,6 @@ export function JadwalRondaScreen({ vm }) {
                                     </div>
                                   </div>
                                 ))}
-                                {members.length > 3 && (
-                                  <button onClick={() => toggleExpand(kelompok.id)} className="text-[11px] font-bold text-brand hover:text-brand-deep text-left px-2 py-1 mt-1 transition-colors">
-                                    {isExpanded ? "Tutup" : `Lihat ${members.length - 3} lainnya...`}
-                                  </button>
-                                )}
                               </div>
                             ) : (
                               <div className="w-full h-full min-h-[40px]"></div>
