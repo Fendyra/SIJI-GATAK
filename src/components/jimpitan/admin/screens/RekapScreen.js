@@ -238,7 +238,7 @@ export function RekapScreen({ vm }) {
           <div className="font-bold text-[16px] text-gray-900 mb-8">Pembagian Kas</div>
           <div className="flex flex-col sm:flex-row lg:flex-col items-center gap-8">
             
-            <div className="relative w-[180px] h-[180px] rounded-full shadow-inner flex-shrink-0" style={{ background: \`conic-gradient(#86efac 0% \${pctRt}%, #fed7aa \${pctRt}% 100%)\` }}>
+            <div className="relative w-[180px] h-[180px] rounded-full shadow-inner flex-shrink-0" style={{ background: `conic-gradient(#86efac 0% ${pctRt}%, #fed7aa ${pctRt}% 100%)` }}>
               <div className="absolute inset-0 m-4 bg-white rounded-full flex flex-col items-center justify-center shadow-sm">
                 <span className="font-display font-extrabold text-[15px] text-gray-900 leading-tight">{vm.rekapTotalDisplay}</span>
                 <span className="text-[11px] font-bold text-gray-400 mt-0.5">Total</span>
@@ -305,7 +305,7 @@ export function RekapScreen({ vm }) {
                     <td className="py-3.5 text-right">
                       <div className="flex items-center justify-end gap-3">
                         <div className="w-[100px] h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: \`\${r.progress}%\` }}></div>
+                          <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: `${r.progress}%` }}></div>
                         </div>
                         <div className="text-[12px] font-bold text-gray-700 w-10 text-right">{r.progress?.toFixed(1)}%</div>
                       </div>
@@ -359,7 +359,7 @@ export function RekapScreen({ vm }) {
                     <td className="py-3.5 text-right">
                       <div className="flex items-center justify-end gap-3">
                         <div className="w-[80px] h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: \`\${k.progress}%\` }}></div>
+                          <div className="h-full bg-brand rounded-full transition-all duration-1000" style={{ width: `${k.progress}%` }}></div>
                         </div>
                         <div className="text-[12px] font-bold text-gray-700 w-10 text-right">{k.progress?.toFixed(1)}%</div>
                       </div>
@@ -441,7 +441,7 @@ export function RekapScreen({ vm }) {
       {/* KELOMPOK DETAIL MODAL (Existing logic) */}
       {vm.selectedRekapKelompok ? (
         <Modal onClose={() => vm.setSelectedRekapKelompok(null)}>
-          <ModalHeader title={\`Detail \${vm.selectedRekapKelompok.nama}\`} subtitle="Penarikan Jimpitan Berdasarkan Kelompok" />
+          <ModalHeader title={`Detail ${vm.selectedRekapKelompok.nama}`} subtitle="Penarikan Jimpitan Berdasarkan Kelompok" />
           <div className="mb-4">
             <div className="text-sm font-bold">Total Terkumpul</div>
             <div className="font-display text-xl font-extrabold text-brand">{vm.selectedRekapKelompok.display}</div>
