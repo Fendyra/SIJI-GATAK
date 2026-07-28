@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { QrCanvas, downloadQr } from "../../ui/SharedUI";
 
 export function QrScreen({ vm }) {
+  const [viewMode, setViewMode] = useState("grid");
   const [isDownloading, setIsDownloading] = useState(false);
   const [activeRt, setActiveRt] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
@@ -178,51 +179,112 @@ export function QrScreen({ vm }) {
               />
             </div>
             <div className="flex items-center gap-1 border-l border-gray-100 pl-3">
-              <button className="p-2 rounded-lg bg-green-50 text-brand">
+              <button 
+                onClick={() => setViewMode("grid")}
+                className={`p-2 rounded-lg transition-colors cursor-pointer \${viewMode === "grid" ? 'bg-green-50 text-brand' : 'text-gray-400 hover:bg-gray-50'}`}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
               </button>
-              <button className="p-2 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+              <button 
+                onClick={() => setViewMode("list")}
+                className={`p-2 rounded-lg transition-colors cursor-pointer \${viewMode === "list" ? 'bg-green-50 text-brand' : 'text-gray-400 hover:bg-gray-50'}`}
+                className={`p-2 rounded-lg transition-colors cursor-pointer ${viewMode === "list" ? 'bg-green-50 text-brand' : 'text-gray-400 hover:bg-gray-50'}`}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
               </button>
             </div>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {paginatedData.length === 0 ? (
-              <div className="col-span-full py-16 text-center text-gray-400 text-[13px]">
-                Tidak ada data QR code ditemukan.
-              </div>
-            ) : paginatedData.map((h, index) => {
-              const canvasId = `qr-canvas-${h.id}`;
-              const qrUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${h.qr_code?.split('/').pop()}`;
-              
-              return (
-                <div key={h.id} className="bg-white rounded-2xl border border-card-border shadow-sm p-4 flex flex-col items-center relative group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 text-gray-400 cursor-pointer hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                  </div>
-                  
-                  <div className="w-[120px] h-[120px] bg-[#f6f4ee] rounded-xl flex items-center justify-center mb-4 mt-2">
-                    <QrCanvas value={qrUrl} size={100} id={canvasId} />
-                  </div>
-                  
-                  <div className="text-center w-full mb-4">
-                    <div className="text-[14px] font-bold text-gray-900 truncate px-2">{h.nama_penghuni || "-"}</div>
-                    <div className="text-[11px] text-gray-400 mt-1">{h.rt || "Dukuhan"}</div>
-                  </div>
-                  
-                  <button 
-                    onClick={() => downloadQr(canvasId, h.nama_penghuni || "rumah")}
-                    className="w-full py-2 rounded-xl border border-gray-200 text-brand font-bold text-[12px] flex items-center justify-center gap-1.5 hover:bg-brand hover:text-white transition-colors hover:border-brand"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Unduh PNG
-                  </button>
+          {/* List or Grid Views */}
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {paginatedData.length === 0 ? (
+                <div className="col-span-full py-16 text-center text-gray-400 text-[13px]">
+                  Tidak ada data QR code ditemukan.
                 </div>
-              );
-            })}
-          </div>
+              ) : paginatedData.map((h, index) => {
+                const canvasId = `qr-canvas-${h.id}`;
+                const qrUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${h.qr_code?.split('/').pop()}`;
+                
+                return (
+                  <div key={h.id} className="bg-white rounded-2xl border border-card-border shadow-sm p-4 flex flex-col items-center relative group hover:shadow-md transition-shadow">
+                    <div className="absolute top-4 right-4 text-gray-400 cursor-pointer hover:text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                    </div>
+                    
+                    <div className="w-[120px] h-[120px] bg-[#f6f4ee] rounded-xl flex items-center justify-center mb-4 mt-2">
+                      <QrCanvas value={qrUrl} size={100} id={canvasId} />
+                    </div>
+                    
+                    <div className="text-center w-full mb-4">
+                      <div className="text-[14px] font-bold text-gray-900 truncate px-2">{h.nama_penghuni || "-"}</div>
+                      <div className="text-[11px] text-gray-400 mt-1">{h.rt || "Dukuhan"}</div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => downloadQr(canvasId, h.nama_penghuni || "rumah")}
+                      className="w-full py-2 rounded-xl border border-gray-200 text-brand font-bold text-[12px] flex items-center justify-center gap-1.5 hover:bg-brand hover:text-white transition-colors hover:border-brand cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                      Unduh PNG
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-card-border overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[500px]">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <th className="py-4 px-5 text-[12px] font-bold text-gray-500 font-display">QR Code</th>
+                      <th className="py-4 px-5 text-[12px] font-bold text-gray-500 font-display">Nama Warga</th>
+                      <th className="py-4 px-5 text-[12px] font-bold text-gray-500 font-display">RT / Kampung</th>
+                      <th className="py-4 px-5 w-[150px] text-[12px] font-bold text-gray-500 font-display text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedData.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="py-16 text-center text-gray-400 text-[13px]">
+                          Tidak ada data QR code ditemukan.
+                        </td>
+                      </tr>
+                    ) : paginatedData.map((h) => {
+                      const canvasId = `qr-canvas-${h.id}-list`;
+                      const qrUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${h.qr_code?.split('/').pop()}`;
+                      
+                      return (
+                        <tr key={h.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                          <td className="py-3 px-5 w-[80px]">
+                            <div className="w-[50px] h-[50px] bg-[#f6f4ee] rounded-lg flex items-center justify-center">
+                              <QrCanvas value={qrUrl} size={40} id={canvasId} />
+                            </div>
+                          </td>
+                          <td className="py-3 px-5">
+                            <div className="text-[13px] font-bold text-gray-900">{h.nama_penghuni || "-"}</div>
+                          </td>
+                          <td className="py-3 px-5">
+                            <div className="text-[12px] text-gray-500 font-medium">{h.rt || "Dukuhan"}</div>
+                          </td>
+                          <td className="py-3 px-5 text-center">
+                            <button 
+                              onClick={() => downloadQr(canvasId, h.nama_penghuni || "rumah")}
+                              className="px-4 py-2 rounded-xl border border-gray-200 text-brand font-bold text-[12px] flex items-center justify-center gap-1.5 hover:bg-brand hover:text-white transition-colors hover:border-brand w-full cursor-pointer"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                              Unduh
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Pagination Footer */}
           {paginatedData.length > 0 && (
