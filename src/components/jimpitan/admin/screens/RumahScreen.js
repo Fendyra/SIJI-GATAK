@@ -14,7 +14,7 @@ export function RumahScreen({ vm }) {
 
   // Process data: search, filter by RT, sort
   const processedData = useMemo(() => {
-    let filtered = vm.rumahAdminRowsWithActions;
+    let filtered = vm.rumahAdminRows || [];
     
     // Filter by RT Tab
     if (activeRt !== "Semua") {
@@ -34,18 +34,18 @@ export function RumahScreen({ vm }) {
     filtered.sort((a, b) => (a.nama_penghuni || "").localeCompare(b.nama_penghuni || ""));
     
     return filtered;
-  }, [vm.rumahAdminRowsWithActions, activeRt, searchQuery]);
+  }, [vm.rumahAdminRows, activeRt, searchQuery]);
 
   // Available RT tabs derived from actual data
   const availableTabs = useMemo(() => {
     const tabs = new Set();
-    vm.rumahAdminRowsWithActions.forEach(h => {
+    (vm.rumahAdminRows || []).forEach(h => {
       if (h.rt) tabs.add(h.rt);
     });
     // Ensure standard ordering if possible
     const sorted = Array.from(tabs).sort();
     return ["Semua", ...sorted];
-  }, [vm.rumahAdminRowsWithActions]);
+  }, [vm.rumahAdminRows]);
 
   // Pagination
   const totalItems = processedData.length;
